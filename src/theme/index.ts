@@ -1,4 +1,4 @@
-export const colors = {
+﻿// LifeLens - CodeRed Hackathon 2026`nexport const colors = {
   primary: '#0A84FF',
   primaryDark: '#0066CC',
   primaryLight: '#E8F4FD',
@@ -80,3 +80,4 @@ export const shadows = {
     elevation: 8,
   },
 };
+
