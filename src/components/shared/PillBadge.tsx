@@ -16,7 +16,7 @@ const variantStyles: Record<BadgeVariant, { bg: string; text: string }> = {
   warning: { bg: colors.warningMuted, text: colors.warning },
   danger: { bg: colors.dangerMuted, text: colors.danger },
   info: { bg: colors.primaryMuted, text: colors.primary },
-  neutral: { bg: '#F4F4F5', text: colors.textSecondary },
+  neutral: { bg: colors.surfaceSecondary, text: colors.textSecondary },
 };
 
 export const PillBadge: React.FC<PillBadgeProps> = memo(({ label, variant = 'neutral', icon }) => {
@@ -35,13 +35,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'flex-start',
     gap: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 3,
-    borderRadius: radius.sm,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: radius.full,
   },
   label: {
-    fontSize: typography.meta.fontSize,
-    fontWeight: '500',
-    lineHeight: typography.meta.lineHeight,
+    fontSize: 11,
+    fontWeight: '600',
+    lineHeight: 14,
   },
 });

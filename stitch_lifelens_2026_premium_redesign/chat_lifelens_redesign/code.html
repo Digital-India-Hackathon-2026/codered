@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LifeLens - Clary AI Chat</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "inverse-on-surface": "#edf0ff",
+                        "on-error": "#ffffff",
+                        "surface-container": "#e9edff",
+                        "surface-container-high": "#e1e8fd",
+                        "surface-dim": "#d3daef",
+                        "primary-fixed": "#dce1ff",
+                        "tertiary-fixed-dim": "#c4c0ff",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#007070",
+                        "on-primary-container": "#d2d9ff",
+                        "surface-variant": "#dce2f7",
+                        "on-secondary-fixed": "#002020",
+                        "surface-container-low": "#f1f3ff",
+                        "primary-container": "#2453d9",
+                        "on-background": "#141b2b",
+                        "tertiary-fixed": "#e3dfff",
+                        "tertiary-container": "#5145e3",
+                        "outline": "#747686",
+                        "secondary-container": "#7df5f5",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "inverse-surface": "#293040",
+                        "secondary": "#006a6a",
+                        "on-tertiary-fixed": "#100069",
+                        "on-secondary-fixed-variant": "#004f50",
+                        "on-tertiary-container": "#dad6ff",
+                        "on-surface-variant": "#434654",
+                        "surface": "#f9f9ff",
+                        "tertiary": "#3724cc",
+                        "outline-variant": "#c4c5d7",
+                        "surface-bright": "#f9f9ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#001551",
+                        "surface-container-highest": "#dce2f7",
+                        "on-primary-fixed-variant": "#0039b3",
+                        "background": "#f9f9ff",
+                        "primary": "#003ab6",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#5ed8d8",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#7df5f5",
+                        "on-tertiary-fixed-variant": "#3622ca",
+                        "on-surface": "#141b2b",
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#b6c4ff",
+                        "surface-tint": "#2252d8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "huge": "64px",
+                        "xxl": "48px",
+                        "container-padding": "24px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "section-gap": "64px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "caption": ["Inter"],
+                        "display-hero": ["Manrope"],
+                        "headline-lg": ["Manrope"],
+                        "headline-md": ["Manrope"],
+                        "section-title": ["Manrope"],
+                        "headline-lg-mobile": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "caption": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "display-hero": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "section-title": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-header {
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        
+        .chat-container {
+            height: calc(100vh - 80px - 70px); /* Adjust based on header and bottom nav heights */
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .chat-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .chat-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .chat-container::-webkit-scrollbar-thumb {
+            background-color: theme('colors.outline-variant');
+            border-radius: 20px;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-bubble {
+            animation: slideInUp 0.4s ease-out forwards;
+        }
+
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+        
+        /* Ensure safe area for bottom nav on mobile */
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md antialiased overflow-hidden flex flex-col h-screen">
+<!-- TopAppBar -->
+<header class="glass-header docked full-width top-0 sticky z-50 flex justify-between items-center w-full px-container-padding py-md shadow-[0px_4px_20px_rgba(17,24,39,0.04)]">
+<div class="flex items-center gap-md">
+<button aria-label="Go back" class="hover:opacity-80 transition-opacity active:scale-95 text-primary dark:text-inverse-primary">
+<span class="material-symbols-outlined text-headline-md" style="font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;">arrow_back</span>
+</button>
+<div class="flex items-center gap-sm">
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary">Clary AI</h1>
+<div class="flex items-center gap-xs bg-secondary-container/20 px-sm py-xs rounded-full">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span class="font-caption text-caption text-secondary">Online</span>
+</div>
+</div>
+</div>
+<button aria-label="Chat history" class="hover:opacity-80 transition-opacity active:scale-95 text-on-surface-variant dark:text-outline-variant">
+<span class="material-symbols-outlined text-headline-md" style="font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;">history</span>
+</button>
+</header>
+<!-- Main Chat Area -->
+<main class="chat-container flex-1 w-full px-container-padding py-xl flex flex-col relative" id="chatArea">
+<!-- Empty State (Initially visible, hidden on chat start) -->
+<div class="flex flex-col items-center justify-center flex-1 h-full w-full max-w-2xl mx-auto text-center mt-xxl" id="emptyState">
+<!-- Premium AI Persona Illustration Placeholder -->
+<div class="w-32 h-32 mb-lg rounded-[24px] overflow-hidden shadow-[0px_10px_32px_rgba(17,24,39,0.08)] bg-surface-container relative">
+<img class="w-full h-full object-cover" data-alt="A sophisticated, minimalist 3D rendering of a friendly artificial intelligence persona named Clary. The design features soft, translucent geometric shapes resembling a glowing, stylized brain or friendly entity. The lighting is bright and modern, creating a clinical but warm aesthetic. The color palette focuses on soft primary blues and crisp whites." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOwH4z3vUuvk-uj5O8qVQA9ayXZQo-ssEzepmp42XPQH6oTLXf4foMifmQ3tJ-c6KLPrE3GXKfxiRjqslb7y3aEiYg5kr60aWGLqra9vshOZXUWjyCduCRDvUwSbIMufRd1PBb8deqmEmne8Fre2XyFGZ42wNcFOqJP2FM3S_FvhkI0Qq-78LHiUbhYrHd1mbRZqnrFmyeyLRbSOSm8FF0xL3JnMrAOrum13tCtDzFBzrvdERljdiq"/>
+</div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-sm">How can I help you today?</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-xl max-w-md">I'm Clary, your personal medical assistant. You can ask me to analyze data or check symptoms.</p>
+<!-- Quick Reply Chips (Bento-style layout) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md w-full">
+<button class="chip-btn flex items-center gap-sm bg-surface rounded-[24px] p-lg border border-outline-variant/30 shadow-[0px_4px_20px_rgba(17,24,39,0.04)] hover:shadow-[0px_10px_32px_rgba(17,24,39,0.08)] transition-all hover:-translate-y-1 text-left" onclick="sendQuickReply('Check my vitals')">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;">monitor_heart</span>
+<span class="font-label-md text-label-md text-on-surface">Check my vitals</span>
+</button>
+<button class="chip-btn flex items-center gap-sm bg-surface rounded-[24px] p-lg border border-outline-variant/30 shadow-[0px_4px_20px_rgba(17,24,39,0.04)] hover:shadow-[0px_10px_32px_rgba(17,24,39,0.08)] transition-all hover:-translate-y-1 text-left" onclick="sendQuickReply('Analyze my reports')">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;">analytics</span>
+<span class="font-label-md text-label-md text-on-surface">Analyze my reports</span>
+</button>
+<button class="chip-btn flex items-center gap-sm bg-surface rounded-[24px] p-lg border border-outline-variant/30 shadow-[0px_4px_20px_rgba(17,24,39,0.04)] hover:shadow-[0px_10px_32px_rgba(17,24,39,0.08)] transition-all hover:-translate-y-1 text-left md:col-span-2 md:justify-center" onclick="sendQuickReply('Symptom checker')">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;">stethoscope</span>
+<span class="font-label-md text-label-md text-on-surface">Symptom checker</span>
+</button>
+</div>
+</div>
+<!-- Chat Messages Container (Initially hidden) -->
+<div class="hidden flex-col gap-lg w-full max-w-3xl mx-auto pb-huge" id="messagesContainer">
+<!-- Messages will be injected here via JS -->
+</div>
+<!-- Bottom spacing for fixed input -->
+<div class="h-24"></div>
+</main>
+<!-- Input Bar -->
+<div class="fixed bottom-20 md:bottom-0 left-0 w-full z-40 px-container-padding py-md glass-header">
+<div class="max-w-3xl mx-auto relative flex items-end gap-sm bg-surface border border-outline-variant/30 rounded-[24px] p-sm shadow-[0px_4px_20px_rgba(17,24,39,0.04)] transition-all focus-within:shadow-[0px_10px_32px_rgba(17,24,39,0.08)] focus-within:border-primary">
+<button aria-label="Add attachment" class="p-sm text-outline hover:text-primary transition-colors flex-shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;">add_circle</span>
+</button>
+<textarea class="w-full bg-transparent border-none focus:ring-0 font-body-md text-body-md text-on-surface placeholder:text-outline-variant resize-none max-h-32 py-sm" id="chatInput" oninput="autoResize(this)" onkeypress="handleEnter(event)" placeholder="Ask Clary..." rows="1"></textarea>
+<div class="flex items-center gap-xs flex-shrink-0">
+<button aria-label="Send message" class="p-sm text-outline hover:text-primary transition-colors hidden" id="sendBtn" onclick="sendMessage()">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;">send</span>
+</button>
+<button aria-label="Voice input" class="p-sm bg-primary-container text-on-primary-container rounded-full hover:opacity-90 transition-opacity" id="voiceBtn">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;">mic</span>
+</button>
+</div>
+</div>
+</div>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden glass-header shadow-[0px_-4px_20px_rgba(17,24,39,0.04)] fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe h-20 rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined mb-xs" style="font-variation-settings: 'FILL' 0, 'wght' 400;">home</span>
+<span class="font-label-md text-label-md hidden md:block">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined mb-xs" style="font-variation-settings: 'FILL' 0, 'wght' 400;">history</span>
+<span class="font-label-md text-label-md hidden md:block">Timeline</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-full px-4 py-1 transition-all duration-300 ease-in-out scale-90" href="#">
+<span class="material-symbols-outlined mb-xs" style="font-variation-settings: 'FILL' 1, 'wght' 400;">smart_toy</span>
+<span class="font-label-md text-label-md hidden md:block">AI Chat</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined mb-xs" style="font-variation-settings: 'FILL' 0, 'wght' 400;">analytics</span>
+<span class="font-label-md text-label-md hidden md:block">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined mb-xs" style="font-variation-settings: 'FILL' 0, 'wght' 400;">person</span>
+<span class="font-label-md text-label-md hidden md:block">Profile</span>
+</a>
+</nav>
+<script>
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const voiceBtn = document.getElementById('voiceBtn');
+        const emptyState = document.getElementById('emptyState');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const chatArea = document.getElementById('chatArea');
+
+        // Auto-resize textarea
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
+            
+            // Toggle send/voice button based on content
+            if (textarea.value.trim().length > 0) {
+                sendBtn.classList.remove('hidden');
+                voiceBtn.classList.add('hidden');
+            } else {
+                sendBtn.classList.add('hidden');
+                voiceBtn.classList.remove('hidden');
+                textarea.style.height = 'auto'; // Reset if empty
+            }
+        }
+
+        // Handle Enter key
+        function handleEnter(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+
+        // Quick Reply handler
+        function sendQuickReply(text) {
+            chatInput.value = text;
+            sendMessage();
+        }
+
+        // Send Message Logic
+        function sendMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            // Hide empty state, show messages
+            if (!emptyState.classList.contains('hidden')) {
+                emptyState.classList.add('hidden');
+                messagesContainer.classList.remove('hidden');
+                messagesContainer.classList.add('flex');
+            }
+
+            // Create User Message Bubble
+            appendMessage(text, 'user');
+            
+            // Clear input
+            chatInput.value = '';
+            autoResize(chatInput);
+
+            // Simulate Clary typing & response
+            showTypingIndicator();
+            setTimeout(() => {
+                removeTypingIndicator();
+                simulateClaryResponse(text);
+            }, 1500);
+        }
+
+        function appendMessage(text, sender) {
+            const bubble = document.createElement('div');
+            bubble.className = `flex w-full animate-bubble opacity-0 ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
+            
+            if (sender === 'user') {
+                bubble.innerHTML = `
+                    <div class="max-w-[85%] md:max-w-[70%] bg-primary text-on-primary rounded-[24px] rounded-br-sm px-lg py-md shadow-[0px_4px_20px_rgba(17,24,39,0.04)]">
+                        <p class="font-body-md text-body-md whitespace-pre-wrap">${text}</p>
+                    </div>
+                `;
+            } else {
+                bubble.innerHTML = `
+                    <div class="flex items-end gap-sm max-w-[85%] md:max-w-[70%]">
+                        <div class="w-8 h-8 rounded-full bg-surface-container flex-shrink-0 overflow-hidden hidden md:block">
+                            <img src="placeholder" data-alt="A small circular avatar of Clary, the AI persona, featuring soft glowing blue and white elements." class="w-full h-full object-cover">
+                        </div>
+                        <div class="bg-surface border border-outline-variant/20 text-on-surface rounded-[24px] rounded-bl-sm px-lg py-md shadow-[0px_4px_20px_rgba(17,24,39,0.04)]">
+                            <p class="font-body-md text-body-md whitespace-pre-wrap">${text}</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            messagesContainer.appendChild(bubble);
+            scrollToBottom();
+        }
+
+        function showTypingIndicator() {
+            const indicator = document.createElement('div');
+            indicator.id = 'typingIndicator';
+            indicator.className = 'flex w-full justify-start animate-bubble opacity-0';
+            indicator.innerHTML = `
+                <div class="flex items-end gap-sm max-w-[85%] md:max-w-[70%]">
+                    <div class="w-8 h-8 rounded-full bg-surface-container flex-shrink-0 overflow-hidden hidden md:block">
+                        <img src="placeholder" data-alt="A small circular avatar of Clary, the AI persona, featuring soft glowing blue and white elements." class="w-full h-full object-cover">
+                    </div>
+                    <div class="bg-surface border border-outline-variant/20 rounded-[24px] rounded-bl-sm px-lg py-md shadow-[0px_4px_20px_rgba(17,24,39,0.04)] flex items-center gap-xs h-[56px]">
+                        <div class="w-2 h-2 bg-outline-variant rounded-full animate-bounce"></div>
+                        <div class="w-2 h-2 bg-outline-variant rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                        <div class="w-2 h-2 bg-outline-variant rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+                    </div>
+                </div>
+            `;
+            messagesContainer.appendChild(indicator);
+            scrollToBottom();
+        }
+
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) indicator.remove();
+        }
+
+        function scrollToBottom() {
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function simulateClaryResponse(userText) {
+            let response = "I'm analyzing that for you now. Based on your recent data, everything appears to be within normal parameters. Is there a specific detail you'd like me to focus on?";
+            
+            if (userText.toLowerCase().includes('vitals')) {
+                response = "Your latest resting heart rate is 68 bpm, and your blood pressure is 118/78. Both are excellent. Your sleep quality score was 85% last night.";
+            } else if (userText.toLowerCase().includes('report')) {
+                response = "I've scanned your recent lab reports. All key indicators including cholesterol and glucose levels are in the optimal range. Your Vitamin D levels have improved since last month.";
+            }
+            
+            appendMessage(response, 'clary');
+        }
+    </script>
+</body></html>

@@ -1,24 +1,36 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withTiming, withDelay } from 'react-native-reanimated';
-import { Icon } from '../shared';
-import { colors, spacing } from '../../theme';
+import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, withDelay, withSequence } from 'react-native-reanimated';
+import ClaryOrb from '../shared/ClaryOrb';
+import { colors, radius } from '../../theme';
 
 const Dot = ({ delay }: { delay: number }) => {
+  const scale = useSharedValue(0.6);
   const opacity = useSharedValue(0.3);
-  React.useEffect(() => {
-    opacity.value = withDelay(delay, withRepeat(withTiming(1, { duration: 400 }), -1, true));
+
+  useEffect(() => {
+    scale.value = withDelay(delay, withRepeat(
+      withSequence(withTiming(1, { duration: 300 }), withTiming(0.6, { duration: 300 })),
+      -1, false
+    ));
+    opacity.value = withDelay(delay, withRepeat(
+      withSequence(withTiming(1, { duration: 300 }), withTiming(0.3, { duration: 300 })),
+      -1, false
+    ));
   }, []);
-  const style = useAnimatedStyle(() => ({ opacity: opacity.value }));
+
+  const style = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity: opacity.value,
+  }));
+
   return <Animated.View style={[s.dot, style]} />;
 };
 
 export const TypingIndicator: React.FC = memo(() => (
   <View style={s.container}>
-    <View style={s.avatar}>
-      <Icon name="cpu" size={12} color={colors.primary} />
-    </View>
-    <View style={s.dots}>
+    <ClaryOrb size={24} glow={false} streaming />
+    <View style={s.bubble}>
       <Dot delay={0} />
       <Dot delay={150} />
       <Dot delay={300} />
@@ -27,12 +39,17 @@ export const TypingIndicator: React.FC = memo(() => (
 ));
 
 const s = StyleSheet.create({
-  container: { flexDirection: 'row', paddingHorizontal: spacing.lg, marginBottom: spacing.md, alignItems: 'center' },
-  avatar: {
-    width: 28, height: 28, borderRadius: 14,
-    backgroundColor: colors.primaryMuted, justifyContent: 'center', alignItems: 'center',
-    marginRight: spacing.sm,
+  container: { flexDirection: 'row', paddingHorizontal: 20, marginBottom: 16, alignItems: 'center', gap: 8 },
+  bubble: {
+    flexDirection: 'row',
+    gap: 6,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    borderBottomLeftRadius: radius.sm,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
-  dots: { flexDirection: 'row', gap: 4, paddingVertical: spacing.sm },
-  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.textTertiary },
+  dot: { width: 7, height: 7, borderRadius: 4, backgroundColor: colors.textTertiary },
 });

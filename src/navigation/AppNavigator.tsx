@@ -3,9 +3,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text, View, StyleSheet } from 'react-native';
-import FeatherIcon from 'react-native-vector-icons/Feather';
 import { useAuth } from '../context/AuthContext';
-import { colors, typography, spacing } from '../theme';
+import { Icon } from '../components/shared/Icon';
+import { colors, typography, shadows } from '../theme';
 
 // Auth Screens
 import { LoginScreen } from '../screens/auth/LoginScreen';
@@ -14,7 +14,13 @@ import { OtpVerifyScreen } from '../screens/auth/OtpVerifyScreen';
 
 // Main Screens
 import { HomeScreen } from '../screens/home/HomeScreen';
-import { TimelineScreen } from '../screens/timeline/TimelineScreen';
+import { FeedScreen } from '../screens/feed/FeedScreen';
+import { PostDetailScreen } from '../screens/feed/PostDetailScreen';
+import { AmaDetailScreen } from '../screens/feed/AmaDetailScreen';
+import { CommunityDetailScreen } from '../screens/feed/CommunityDetailScreen';
+import { CreatePostScreen } from '../screens/feed/CreatePostScreen';
+import { BloodRequestDetailScreen } from '../screens/feed/BloodRequestDetailScreen';
+import { CreateBloodRequestScreen } from '../screens/feed/CreateBloodRequestScreen';
 import { AddEventScreen } from '../screens/timeline/AddEventScreen';
 import { ChatScreen } from '../screens/chat/ChatScreen';
 import { ChatHistoryScreen } from '../screens/chat/ChatHistoryScreen';
@@ -26,16 +32,17 @@ import { AddMedicationScreen } from '../screens/medications/AddMedicationScreen'
 import { VitalsScreen } from '../screens/vitals/VitalsScreen';
 import { InsightsScreen } from '../screens/insights/InsightsScreen';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
+import { SplashScreen } from '../screens/splash/SplashScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-const TAB_ICONS: Record<string, string> = {
-  HomeTab: 'home',
-  TimelineTab: 'clock',
-  ChatTab: 'message-circle',
-  ReportsTab: 'file-text',
-  ProfileTab: 'user',
+const TAB_CONFIG: Record<string, { icon: string; label: string }> = {
+  HomeTab: { icon: 'House', label: 'Home' },
+  ChatTab: { icon: 'ChatCircle', label: 'Clary' },
+  VitalsTab: { icon: 'Heartbeat', label: 'Vitals' },
+  TimelineTab: { icon: 'Compass', label: 'Discover' },
+  ProfileTab: { icon: 'User', label: 'Profile' },
 };
 
 const MainTabs = () => (
@@ -43,23 +50,24 @@ const MainTabs = () => (
     screenOptions={({ route }) => ({
       headerShown: false,
       tabBarStyle: styles.tabBar,
-      tabBarActiveTintColor: colors.primary,
+      tabBarActiveTintColor: colors.coral,
       tabBarInactiveTintColor: colors.textTertiary,
       tabBarLabelStyle: styles.tabLabel,
       tabBarHideOnKeyboard: true,
       tabBarIcon: ({ focused }) => (
-        <FeatherIcon
-          name={TAB_ICONS[route.name] || 'circle'}
-          size={20}
-          color={focused ? colors.primary : colors.textTertiary}
+        <Icon
+          name={TAB_CONFIG[route.name]?.icon || 'Circle'}
+          size={22}
+          color={focused ? colors.coral : colors.textTertiary}
+          weight={focused ? 'fill' : 'duotone'}
         />
       ),
     })}
   >
     <Tab.Screen name="HomeTab" component={HomeScreen} options={{ tabBarLabel: 'Home' }} />
-    <Tab.Screen name="TimelineTab" component={TimelineScreen} options={{ tabBarLabel: 'Timeline' }} />
-    <Tab.Screen name="ChatTab" component={ChatScreen} options={{ tabBarLabel: 'Chat' }} />
-    <Tab.Screen name="ReportsTab" component={ReportsScreen} options={{ tabBarLabel: 'Reports' }} />
+    <Tab.Screen name="ChatTab" component={ChatScreen} options={{ tabBarLabel: 'Clary' }} />
+    <Tab.Screen name="VitalsTab" component={VitalsScreen} options={{ tabBarLabel: 'Vitals' }} />
+    <Tab.Screen name="TimelineTab" component={FeedScreen} options={{ tabBarLabel: 'Discover' }} />
     <Tab.Screen name="ProfileTab" component={ProfileScreen} options={{ tabBarLabel: 'Profile' }} />
   </Tab.Navigator>
 );
@@ -79,18 +87,20 @@ const AppStack = () => (
     <Stack.Screen name="ChatThread" component={ChatThreadScreen} />
     <Stack.Screen name="MedicationsTab" component={MedicationsScreen} />
     <Stack.Screen name="AddMedication" component={AddMedicationScreen} />
-    <Stack.Screen name="VitalsTab" component={VitalsScreen} />
     <Stack.Screen name="InsightsTab" component={InsightsScreen} />
     <Stack.Screen name="AddEvent" component={AddEventScreen} />
     <Stack.Screen name="UploadReport" component={UploadReportScreen} />
+    <Stack.Screen name="ReportsTab" component={ReportsScreen} />
+    <Stack.Screen name="PostDetail" component={PostDetailScreen} />
+    <Stack.Screen name="AmaDetail" component={AmaDetailScreen} />
+    <Stack.Screen name="CommunityDetail" component={CommunityDetailScreen} />
+    <Stack.Screen name="CreatePost" component={CreatePostScreen} />
+    <Stack.Screen name="BloodRequestDetail" component={BloodRequestDetailScreen} />
+    <Stack.Screen name="CreateBloodRequest" component={CreateBloodRequestScreen} />
   </Stack.Navigator>
 );
 
-const LoadingScreen = () => (
-  <View style={styles.loading}>
-    <Text style={styles.loadingText}>LifeLens</Text>
-  </View>
-);
+const LoadingScreen = () => <SplashScreen />;
 
 export const AppNavigator = () => {
   const { user, loading } = useAuth();
@@ -115,7 +125,6 @@ const styles = StyleSheet.create({
     elevation: 0,
     shadowOpacity: 0,
   },
-  tabLabel: { fontSize: 11, fontWeight: '500', marginTop: 2 },
-  loading: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background },
-  loadingText: { ...typography.screenTitle, color: colors.text },
+  tabLabel: { fontSize: 10, fontWeight: '500', marginTop: 2 },
+
 });

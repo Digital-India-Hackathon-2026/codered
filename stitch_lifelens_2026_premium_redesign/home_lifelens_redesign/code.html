@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LifeLens - Home</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config injected from Style Guidance -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary": "#ffffff",
+                      "inverse-on-surface": "#edf0ff",
+                      "on-error": "#ffffff",
+                      "surface-container": "#e9edff",
+                      "surface-container-high": "#e1e8fd",
+                      "surface-dim": "#d3daef",
+                      "primary-fixed": "#dce1ff",
+                      "tertiary-fixed-dim": "#c4c0ff",
+                      "error-container": "#ffdad6",
+                      "on-secondary-container": "#007070",
+                      "on-primary-container": "#d2d9ff",
+                      "surface-variant": "#dce2f7",
+                      "on-secondary-fixed": "#002020",
+                      "surface-container-low": "#f1f3ff",
+                      "primary-container": "#2453d9",
+                      "on-background": "#141b2b",
+                      "tertiary-fixed": "#e3dfff",
+                      "tertiary-container": "#5145e3",
+                      "outline": "#747686",
+                      "secondary-container": "#7df5f5",
+                      "on-error-container": "#93000a",
+                      "primary-fixed-dim": "#b6c4ff",
+                      "inverse-surface": "#293040",
+                      "secondary": "#006a6a",
+                      "on-tertiary-fixed": "#100069",
+                      "on-secondary-fixed-variant": "#004f50",
+                      "on-tertiary-container": "#dad6ff",
+                      "on-surface-variant": "#434654",
+                      "surface": "#f9f9ff",
+                      "tertiary": "#3724cc",
+                      "outline-variant": "#c4c5d7",
+                      "surface-bright": "#f9f9ff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-fixed": "#001551",
+                      "surface-container-highest": "#dce2f7",
+                      "on-primary-fixed-variant": "#0039b3",
+                      "background": "#f9f9ff",
+                      "primary": "#003ab6",
+                      "on-secondary": "#ffffff",
+                      "secondary-fixed-dim": "#5ed8d8",
+                      "error": "#ba1a1a",
+                      "secondary-fixed": "#7df5f5",
+                      "on-tertiary-fixed-variant": "#3622ca",
+                      "on-surface": "#141b2b",
+                      "on-tertiary": "#ffffff",
+                      "inverse-primary": "#b6c4ff",
+                      "surface-tint": "#2252d8"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px",
+                      "24": "24px" // Added for components
+              },
+              "spacing": {
+                      "huge": "64px",
+                      "xxl": "48px",
+                      "container-padding": "24px",
+                      "lg": "24px",
+                      "sm": "8px",
+                      "md": "16px",
+                      "xs": "4px",
+                      "section-gap": "64px",
+                      "xl": "32px",
+                      "safe-bottom": "80px" // For bottom nav
+              },
+              "fontFamily": {
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "caption": [
+                              "Inter"
+                      ],
+                      "display-hero": [
+                              "Manrope"
+                      ],
+                      "headline-lg": [
+                              "Manrope"
+                      ],
+                      "headline-md": [
+                              "Manrope"
+                      ],
+                      "section-title": [
+                              "Manrope"
+                      ],
+                      "headline-lg-mobile": [
+                              "Manrope"
+                      ]
+              },
+              "fontSize": {
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "caption": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "display-hero": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "section-title": [
+                              "18px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+            }
+          }
+        }
+      </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .glass-panel {
+                @apply bg-white/70 dark:bg-inverse-surface/70 backdrop-blur-xl border border-outline-variant/30;
+            }
+            .soft-shadow {
+                @apply shadow-[0px_4px_20px_rgba(17,24,39,0.04)];
+            }
+            .hover-elevation {
+                @apply hover:shadow-[0px_10px_32px_rgba(17,24,39,0.08)] transition-all duration-300;
+            }
+            .card-padding {
+                @apply p-lg;
+            }
+            .card-radius {
+                @apply rounded-24;
+            }
+            .material-symbols-outlined {
+                font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            }
+        }
+      </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-safe-bottom font-body-md antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar JSON Translation -->
+<!-- {"name": "TopAppBar", "type": "small", "headline": "LifeLens", "leading_type": "icon", "leading_icon": "arrow_back", "trailing_type": "avatar", "leading_avatar": "User profile photo", "style_bg_color": "bg-white/70 dark:bg-inverse-surface/70 backdrop-blur-xl", "style_primary_color": "text-primary dark:text-inverse-primary", "style_typography": "Headlines: font-headline-md text-headline-md. Labels: font-label-md text-label-md.", "style_brand_logo": "font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary", "style_component_shape": "docked full-width top-0 sticky", "style_separation_logic": "bg-white/70 dark:bg-inverse-surface/70 backdrop-blur-xl", "style_shadows_and_elevation": "shadow-[0px_4px_20px_rgba(17,24,39,0.04)]", "style_active_navigation": "text-primary dark:text-inverse-primary font-bold", "style_inactive_navigation": "text-on-surface-variant dark:text-outline-variant", "style_universal_hover": "hover:opacity-80 transition-opacity", "style_interactions": "Active: scale-95 transition-transform duration-200", "style_shell_layout": "flex justify-between items-center w-full px-container-padding py-md"} -->
+<header class="docked full-width top-0 sticky z-40 bg-white/70 dark:bg-inverse-surface/70 backdrop-blur-xl shadow-[0px_4px_20px_rgba(17,24,39,0.04)]">
+<div class="flex justify-between items-center w-full px-container-padding py-md max-w-7xl mx-auto">
+<div class="flex items-center gap-sm">
+<!-- While JSON specifies arrow_back, for Home screen we'll show brand or menu in a real app. Keeping arrow_back to respect JSON if forced, but user prompt says "Top Header: Welcome message..." I will adapt to user prompt while keeping JSON shell structure. -->
+<span class="material-symbols-outlined text-on-surface-variant hover:opacity-80 transition-opacity cursor-pointer">menu</span>
+</div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary tracking-tight">LifeLens</h1>
+<div class="flex items-center">
+<img alt="User profile photo" class="w-10 h-10 rounded-full object-cover border-2 border-surface-container hover:opacity-80 transition-opacity cursor-pointer" data-alt="A small, high-quality, professional headshot of a young woman named Elena with a warm, natural smile, softly lit against a clean, minimal light-grey background. Modern clinical-but-warm aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCN_0C3M_0XGONrWiKikrEQrniz3er0eaQoRXwiGi7UoSodpLOe5K_w5MqfpVS9HUtSi_e3FhVUT0B5mMEA8v3ZbDuZTZ3B1B1s0BdvDdYCL8ao8lu8p3HZ0lf4y39DITBLjf0W4-PlJe3IbhzHBSiA1RK1ZFk5Djvnk9zrYXCHdzJA9L_worHxAnrFToE7-VcoVv_4XUEyHJ2bWZyqh6C8Wz3fgqfjjY00K7_UC3_Pj7cAItyQ7Pb_"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="max-w-7xl mx-auto px-container-padding pt-lg pb-huge flex flex-col gap-xxl">
+<!-- Welcome Section -->
+<section class="flex flex-col gap-xs">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background">Good morning, Elena <span class="text-primary-container">☀️</span></h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Here is your health snapshot for today.</p>
+</section>
+<!-- Bento Grid Layout for primary content -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-lg">
+<!-- Hero Card: Ask Clary -->
+<div class="md:col-span-8 bg-surface card-radius card-padding soft-shadow hover-elevation border border-surface-variant relative overflow-hidden group cursor-pointer flex flex-col justify-between min-h-[240px]">
+<!-- Soft radial blue gradient background -->
+<div class="absolute -right-20 -top-20 w-96 h-96 bg-[radial-gradient(circle_at_center,_#2453d933_0%,_transparent_70%)] opacity-50 group-hover:scale-110 transition-transform duration-700 ease-out"></div>
+<div class="relative z-10 flex justify-between items-start">
+<div class="bg-primary-container/10 p-md rounded-24 inline-flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-[32px]">smart_toy</span>
+</div>
+<button class="bg-primary hover:bg-on-primary-fixed-variant text-on-primary w-12 h-12 rounded-full flex items-center justify-center transition-colors shadow-sm">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+<div class="relative z-10 mt-auto pt-lg">
+<h3 class="font-headline-md text-headline-md text-on-background mb-xs">Ask Clary</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md">Your AI health assistant is ready. Ask about your latest trends, get tips on sleep, or log a meal.</p>
+</div>
+</div>
+<!-- Vitals Grid Column -->
+<div class="md:col-span-4 flex flex-col gap-lg">
+<!-- Heart Rate Card -->
+<div class="bg-surface card-radius card-padding soft-shadow hover-elevation border border-surface-variant flex items-center justify-between">
+<div class="flex flex-col gap-xs">
+<span class="font-label-md text-label-md text-on-surface-variant flex items-center gap-xs">
+                            Heart Rate
+                        </span>
+<div class="flex items-baseline gap-xs">
+<span class="font-headline-lg-mobile text-headline-lg-mobile text-on-background">72</span>
+<span class="font-caption text-caption text-outline">bpm</span>
+</div>
+<div class="w-full h-1 bg-surface-container rounded-full mt-2 overflow-hidden">
+<div class="h-full bg-secondary-container w-3/4 rounded-full"></div>
+</div>
+</div>
+<div class="bg-error-container/30 p-sm rounded-full">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+</div>
+<!-- Steps Card -->
+<div class="bg-surface card-radius card-padding soft-shadow hover-elevation border border-surface-variant flex items-center justify-between">
+<div class="flex flex-col gap-xs">
+<span class="font-label-md text-label-md text-on-surface-variant flex items-center gap-xs">
+                            Steps
+                        </span>
+<div class="flex items-baseline gap-xs">
+<span class="font-headline-lg-mobile text-headline-lg-mobile text-on-background">3,111</span>
+<span class="font-caption text-caption text-outline">today</span>
+</div>
+<div class="w-full h-1 bg-surface-container rounded-full mt-2 overflow-hidden">
+<div class="h-full bg-tertiary-container w-[40%] rounded-full"></div>
+</div>
+</div>
+<div class="bg-tertiary-container/10 p-sm rounded-full">
+<span class="material-symbols-outlined text-tertiary-container">directions_run</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Recent Activity Section -->
+<section class="flex flex-col gap-lg mt-md">
+<h3 class="font-section-title text-section-title text-on-background flex items-center gap-xs">
+                Recent with Clary
+            </h3>
+<div class="flex flex-col gap-md">
+<!-- Activity Snippet 1 -->
+<div class="bg-surface-container-low p-md rounded-24 flex gap-md items-start border border-surface-variant/50 cursor-pointer hover:bg-surface-container transition-colors">
+<div class="bg-white p-sm rounded-full shadow-sm shrink-0">
+<span class="material-symbols-outlined text-primary text-[20px]">chat</span>
+</div>
+<div class="flex-1">
+<p class="font-body-md text-body-md text-on-background line-clamp-2">"Based on your recent sleep data, trying a magnesium supplement might help you reach deeper REM cycles..."</p>
+<span class="font-caption text-caption text-outline mt-xs block">2 hours ago</span>
+</div>
+</div>
+<!-- Activity Snippet 2 -->
+<div class="bg-surface-container-low p-md rounded-24 flex gap-md items-start border border-surface-variant/50 cursor-pointer hover:bg-surface-container transition-colors">
+<div class="bg-white p-sm rounded-full shadow-sm shrink-0">
+<span class="material-symbols-outlined text-secondary text-[20px]">monitor_heart</span>
+</div>
+<div class="flex-1">
+<p class="font-body-md text-body-md text-on-background line-clamp-2">"Your resting heart rate is down 3bpm this week! Excellent progress on your cardio goals."</p>
+<span class="font-caption text-caption text-outline mt-xs block">Yesterday, 4:30 PM</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Daily Insights (Horizontal Scroll) -->
+<section class="flex flex-col gap-lg mt-md">
+<div class="flex justify-between items-end">
+<h3 class="font-section-title text-section-title text-on-background">For You</h3>
+<span class="font-label-md text-label-md text-primary cursor-pointer hover:underline">See all</span>
+</div>
+<!-- Hide scrollbar but allow scroll -->
+<div class="flex gap-md overflow-x-auto pb-sm -mx-container-padding px-container-padding snap-x snap-mandatory" style="scrollbar-width: none;">
+<!-- Insight Card 1 -->
+<div class="bg-surface card-radius p-md border border-surface-variant soft-shadow min-w-[280px] w-[280px] snap-start flex flex-col gap-md shrink-0 cursor-pointer hover-elevation group">
+<div class="w-full h-32 rounded-xl overflow-hidden relative">
+<div class="bg-cover bg-center w-full h-full transform group-hover:scale-105 transition-transform duration-500" data-alt="A macro, abstract, cinematic photograph of calm, deep blue rippling water at twilight, evoking a sense of deep, restorative sleep. The lighting is soft and ambient. Minimalist, modern clinical-but-warm style." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDVuUOuXtLDtNN2hHP443k0FOi7Qed1vFo6lcwqA9Ha2IPBCTkBcl_n51zp_a1jOEpppXLiNL7aoYcyxPaglfcLDHMgPmI1jnTlVmLYOh8OPcoDd_z_OcgBOKnGfVXW0jZcImF-l_LPQ2ZmlqNHLI_6g23aPreIZk0s8XmUqJP3W4pxIxgH6174Icpy1QRDpYnsi4v7T8G9G5QlchuK8clL4Nm6g5SptqSolmgAV2VM85H3x9QiX6wF')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+<span class="absolute bottom-sm left-sm bg-white/20 backdrop-blur-md text-white font-caption text-caption px-2 py-1 rounded-md">Sleep</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-background mb-xs line-clamp-1">Optimizing Deep Sleep</h4>
+<p class="font-caption text-caption text-on-surface-variant line-clamp-2">Learn how bedroom temperature affects your restorative sleep phases tonight.</p>
+</div>
+</div>
+<!-- Insight Card 2 -->
+<div class="bg-surface card-radius p-md border border-surface-variant soft-shadow min-w-[280px] w-[280px] snap-start flex flex-col gap-md shrink-0 cursor-pointer hover-elevation group">
+<div class="w-full h-32 rounded-xl overflow-hidden relative">
+<div class="bg-cover bg-center w-full h-full transform group-hover:scale-105 transition-transform duration-500" data-alt="A bright, airy, high-key photograph of a condensation-covered glass of infused water with cucumber and lemon slices on a pristine white marble counter. Sunlight casts soft shadows. Modern, clean health-focused aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD8Ocna9jWcEep17U40t20YbKTlRy8toQVjE4ZCb8_hS2aqSTakCGVLYk3GhYasxi37hcTx-izF7jNEiw32wRlbuGbU1CaclGzPM_XOqEIl5hqrmcsd0DGhkl4GRm0rf-XQzyiM3iuhvU2LfU83w1wd3Cxp4pT2h9uKJcCdmFjm-AMGWs7fMeO-XS4hUskYEaIOVecCfiLiGR7vxcKuQq3S0UFdpicGHHamWDfm3OuoXYeXDjGcp6Sy')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+<span class="absolute bottom-sm left-sm bg-white/20 backdrop-blur-md text-white font-caption text-caption px-2 py-1 rounded-md">Nutrition</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-background mb-xs line-clamp-1">Hydration &amp; Energy</h4>
+<p class="font-caption text-caption text-on-surface-variant line-clamp-2">Why timing your water intake can prevent the afternoon energy crash.</p>
+</div>
+</div>
+<!-- Insight Card 3 -->
+<div class="bg-surface card-radius p-md border border-surface-variant soft-shadow min-w-[280px] w-[280px] snap-start flex flex-col gap-md shrink-0 cursor-pointer hover-elevation group">
+<div class="w-full h-32 rounded-xl overflow-hidden relative">
+<div class="bg-cover bg-center w-full h-full transform group-hover:scale-105 transition-transform duration-500" data-alt="A minimalist, top-down shot of high-quality running shoes next to a sleek smart watch on a light oak wooden floor. Warm, natural morning sunlight streaming across the scene. Clinical but warm fitness aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC0DnsPoDY6R_Zdz2bqZJnK5RBguJAqVH5ce7yU2jXtwEtGujmdukiIB1ZOtTK2Cdfbe5A720zZ5MNvCLGLDfcbUBhXqI_IRQjeypXWmJ1kGmRI5mQ5Jy-yLvRGHE9CQZMiK_8WUrs-B_qCiikVL4KWeaDUVAMTjX1j60HL_jL8SrK8gC0tiX7DVrw6lYqeT7bfcQ_ooJzpet2_KtA3EWfrMDdS0s90SMUYLthou3idqQZf9olUhDYJ')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+<span class="absolute bottom-sm left-sm bg-white/20 backdrop-blur-md text-white font-caption text-caption px-2 py-1 rounded-md">Activity</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-background mb-xs line-clamp-1">Zone 2 Training</h4>
+<p class="font-caption text-caption text-on-surface-variant line-clamp-2">The secret to building base endurance without burning out.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar JSON Translation -->
+<!-- {"name": "BottomNavBar", "type": "label_icon", "destination_count": "5", "label_texts": ["Home", "Timeline", "AI Chat", "Reports", "Profile"], "icons": ["home", "history", "smart_toy", "analytics", "person"], "style_bg_color": "bg-white/70 dark:bg-inverse-surface/70 backdrop-blur-xl", "style_primary_color": "text-primary dark:text-inverse-primary", "style_typography": "Labels: font-label-md text-label-md", "style_brand_logo": "hidden", "style_component_shape": "docked full-width bottom-0 fixed rounded-t-xl", "style_separation_logic": "bg-white/70 dark:bg-inverse-surface/70 backdrop-blur-xl", "style_shadows_and_elevation": "shadow-[0px_-4px_20px_rgba(17,24,39,0.04)]", "style_active_navigation": "flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-full px-4 py-1 transition-all duration-300 ease-in-out", "style_inactive_navigation": "flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1", "style_universal_hover": "hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors", "style_interactions": "Active: scale-90 transition-transform duration-300", "style_shell_layout": "fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe h-20"} -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 h-20 bg-white/70 dark:bg-inverse-surface/70 backdrop-blur-xl rounded-t-xl shadow-[0px_-4px_20px_rgba(17,24,39,0.04)]">
+<!-- Home (Active) -->
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-full px-4 py-1 transition-all duration-300 ease-in-out scale-90 group cursor-pointer" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-md text-label-md text-[10px] mt-1">Home</span>
+</a>
+<!-- Timeline -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors rounded-xl cursor-pointer" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-md text-label-md text-[10px] mt-1">Timeline</span>
+</a>
+<!-- AI Chat -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors rounded-xl cursor-pointer" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="font-label-md text-label-md text-[10px] mt-1">AI Chat</span>
+</a>
+<!-- Reports -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors rounded-xl cursor-pointer" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-md text-label-md text-[10px] mt-1">Reports</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors rounded-xl cursor-pointer" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-md text-label-md text-[10px] mt-1">Profile</span>
+</a>
+</nav>
+<!-- Desktop Side Navigation equivalent context (hidden on mobile, standard web app pattern assuming canvas takes right side) -->
+<!-- For simplicity and following the JSON shell instructions closely, BottomNav handles mobile, TopApp handles header. I'll stick to those explicit definitions to avoid cluttering unless requested. -->
+</body></html>

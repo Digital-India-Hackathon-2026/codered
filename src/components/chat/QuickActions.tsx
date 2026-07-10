@@ -1,56 +1,107 @@
 import React, { memo } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
-import { Icon } from '../shared';
-import { colors, spacing, radius, typography } from '../../theme';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
+import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
+import ClaryOrb from '../shared/ClaryOrb';
+import { Icon } from '../shared/Icon';
+import { colors, radius, fonts } from '../../theme';
 
 interface QuickActionsProps {
   onSelect: (text: string) => void;
+  language?: string;
+  onLanguageChange?: (lang: string) => void;
 }
 
-const ACTIONS = [
-  { icon: 'thermometer', label: 'I have a fever', text: 'I have a fever' },
-  { icon: 'cloud', label: 'Headache', text: 'I have a headache' },
-  { icon: 'zap', label: 'Fatigue', text: 'I feel very tired and fatigued' },
-  { icon: 'heart', label: 'Chest pain', text: 'I have chest pain' },
-  { icon: 'frown', label: 'Anxiety', text: 'I feel anxious' },
+const SUGGESTIONS = [
+  'I have a headache and light sensitivity',
+  'Explain my last blood report',
+  'What medications interact with ibuprofen?',
 ];
 
-export const QuickActions: React.FC<QuickActionsProps> = memo(({ onSelect }) => (
+export const QuickActions: React.FC<QuickActionsProps> = memo(({ onSelect, language = 'en', onLanguageChange }) => (
   <View style={s.container}>
-    <View style={s.header}>
-      <View style={s.avatar}>
-        <Icon name="cpu" size={20} color={colors.primary} />
-      </View>
-      <Text style={s.title}>How can I help?</Text>
-      <Text style={s.subtitle}>Describe your symptoms or pick a topic below.</Text>
-    </View>
-    <ScrollView contentContainerStyle={s.chips}>
-      {ACTIONS.map(a => (
-        <Pressable key={a.label} style={s.chip} onPress={() => onSelect(a.text)}>
-          <Icon name={a.icon} size={14} color={colors.textSecondary} />
-          <Text style={s.chipText}>{a.label}</Text>
-        </Pressable>
+    <Animated.View entering={FadeIn.duration(300)} style={s.header}>
+      <ClaryOrb size={72} glow />
+      <Text style={s.title}>Hi, I'm Clary</Text>
+      <Text style={s.subtitle}>
+        Ask about a symptom, a medication, or{'\n'}a report — I'll take it from there.
+      </Text>
+
+      {/* Language Selector */}
+      {onLanguageChange && (
+        <Animated.View entering={FadeInDown.delay(100).duration(200)} style={s.langRow}>
+          <Icon name="Translate" size={14} color={colors.textTertiary} weight="regular" />
+          <Text style={s.langHint}>Reply in:</Text>
+          <Pressable
+            onPress={() => onLanguageChange('en')}
+            style={[s.langPill, language === 'en' && s.langPillActive]}
+          >
+            <Text style={[s.langPillText, language === 'en' && s.langPillTextActive]}>English</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => onLanguageChange('te')}
+            style={[s.langPill, language === 'te' && s.langPillActive]}
+          >
+            <Text style={[s.langPillText, language === 'te' && s.langPillTextActive]}>తెలుగు</Text>
+          </Pressable>
+        </Animated.View>
+      )}
+    </Animated.View>
+
+    <View style={s.chips}>
+      {SUGGESTIONS.map((text, i) => (
+        <Animated.View key={text} entering={FadeInDown.delay(i * 80 + 150).duration(180).damping(18)}>
+          <Pressable style={s.chip} onPress={() => onSelect(text)}>
+            <Text style={s.chipText}>{text}</Text>
+          </Pressable>
+        </Animated.View>
       ))}
-    </ScrollView>
+    </View>
   </View>
 ));
 
 const s = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', paddingHorizontal: spacing.xl },
-  header: { alignItems: 'center', marginBottom: spacing['2xl'] },
-  avatar: {
-    width: 48, height: 48, borderRadius: 24,
-    backgroundColor: colors.primaryMuted, justifyContent: 'center', alignItems: 'center',
-    marginBottom: spacing.md,
+  container: { flex: 1, justifyContent: 'center', paddingHorizontal: 32 },
+  header: { alignItems: 'center', marginBottom: 32 },
+  title: { fontFamily: fonts.fraunces.semiBold, fontSize: 24, color: colors.text, marginTop: 16 },
+  subtitle: { fontFamily: fonts.generalSans.regular, fontSize: 14, lineHeight: 20, color: colors.textSecondary, textAlign: 'center', marginTop: 8 },
+  langRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 16,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
   },
-  title: { ...typography.sectionTitle, color: colors.text },
-  subtitle: { ...typography.caption, color: colors.textSecondary, textAlign: 'center', marginTop: spacing.xs },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: spacing.sm },
+  langHint: { fontFamily: fonts.generalSans.regular, fontSize: 12, color: colors.textTertiary },
+  langPill: {
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: radius.sm,
+    backgroundColor: colors.surfaceSunken,
+  },
+  langPillActive: {
+    backgroundColor: colors.text,
+  },
+  langPillText: {
+    fontFamily: fonts.generalSans.medium,
+    fontSize: 12,
+    color: colors.textSecondary,
+  },
+  langPillTextActive: {
+    color: colors.textInverse,
+  },
+  chips: { gap: 10 },
   chip: {
-    flexDirection: 'row', alignItems: 'center', gap: spacing.xs,
-    paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
-    backgroundColor: colors.surface, borderRadius: radius.sm,
-    borderWidth: 1, borderColor: colors.border,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
   },
-  chipText: { ...typography.caption, color: colors.text },
+  chipText: { fontFamily: fonts.generalSans.regular, fontSize: 14, color: colors.text },
 });
