@@ -26,6 +26,7 @@ export const Button = ({ title, onPress, variant = 'primary', loading, disabled,
   <TouchableOpacity
     onPress={onPress}
     disabled={disabled || loading}
+    activeOpacity={0.7}
     style={[
       styles.button,
       variant === 'primary' && styles.buttonPrimary,
@@ -43,7 +44,7 @@ export const Button = ({ title, onPress, variant = 'primary', loading, disabled,
         <Text style={[
           styles.buttonText,
           variant === 'outline' && { color: colors.primary },
-          variant === 'ghost' && { color: colors.primary },
+          variant === 'ghost' && { color: colors.textSecondary },
           variant === 'secondary' && { color: colors.text },
         ]}>
           {title}
@@ -85,15 +86,15 @@ interface CardProps {
 export const Card = ({ children, style, onPress }: CardProps) => {
   const Wrapper = onPress ? TouchableOpacity : View;
   return (
-    <Wrapper onPress={onPress} style={[styles.card, style]}>
+    <Wrapper onPress={onPress} activeOpacity={0.7} style={[styles.card, style]}>
       {children}
     </Wrapper>
   );
 };
 
 // Badge
-export const Badge = ({ text, color = colors.primary }: { text: string; color?: string }) => (
-  <View style={[styles.badge, { backgroundColor: color + '20' }]}>
+export const Badge = ({ text, color = colors.textSecondary }: { text: string; color?: string }) => (
+  <View style={[styles.badge, { backgroundColor: color + '12' }]}>
     <Text style={[styles.badgeText, { color }]}>{text}</Text>
   </View>
 );
@@ -103,7 +104,7 @@ export const SectionHeader = ({ title, action, onAction }: { title: string; acti
   <View style={styles.sectionHeader}>
     <Text style={styles.sectionTitle}>{title}</Text>
     {action && (
-      <TouchableOpacity onPress={onAction}>
+      <TouchableOpacity onPress={onAction} activeOpacity={0.7}>
         <Text style={styles.sectionAction}>{action}</Text>
       </TouchableOpacity>
     )}
@@ -121,53 +122,53 @@ export const EmptyState = ({ icon, title, subtitle }: { icon: string; title: str
 
 const styles = StyleSheet.create({
   button: {
-    height: 52,
-    borderRadius: borderRadius.md,
+    height: 48,
+    borderRadius: borderRadius.sm,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: spacing.xl,
   },
   buttonPrimary: { backgroundColor: colors.primary },
-  buttonSecondary: { backgroundColor: colors.primaryLight },
-  buttonOutline: { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: colors.primary },
+  buttonSecondary: { backgroundColor: '#F4F4F5' },
+  buttonOutline: { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.border },
   buttonGhost: { backgroundColor: 'transparent' },
-  buttonDisabled: { opacity: 0.5 },
+  buttonDisabled: { opacity: 0.4 },
   buttonContent: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  buttonText: { ...typography.bodyBold, color: '#fff' },
+  buttonText: { ...typography.cardTitle, color: '#fff' },
   inputContainer: { marginBottom: spacing.lg },
-  inputLabel: { ...typography.caption, color: colors.textSecondary, marginBottom: spacing.xs, fontWeight: '600' },
+  inputLabel: { ...typography.meta, color: colors.textSecondary, marginBottom: spacing.xs, fontWeight: '500' },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.background,
-    borderRadius: borderRadius.md,
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.sm,
     borderWidth: 1,
     borderColor: colors.border,
     paddingHorizontal: spacing.lg,
   },
   inputError: { borderColor: colors.danger },
   inputIcon: { marginRight: spacing.sm },
-  input: { flex: 1, height: 48, ...typography.body, color: colors.text },
-  errorText: { ...typography.small, color: colors.danger, marginTop: spacing.xs },
+  input: { flex: 1, height: 44, ...typography.body, color: colors.text },
+  errorText: { ...typography.meta, color: colors.danger, marginTop: spacing.xs },
   card: {
     backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
+    borderRadius: borderRadius.md,
     padding: spacing.lg,
-    ...shadows.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
-  badge: { paddingHorizontal: spacing.sm, paddingVertical: spacing.xs, borderRadius: borderRadius.full },
-  badgeText: { ...typography.small, fontWeight: '600' },
+  badge: { paddingHorizontal: spacing.sm, paddingVertical: 2, borderRadius: borderRadius.sm },
+  badgeText: { ...typography.meta, fontWeight: '500' },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: spacing.md,
-    paddingHorizontal: spacing.lg,
   },
-  sectionTitle: { ...typography.h3, color: colors.text },
-  sectionAction: { ...typography.caption, color: colors.primary, fontWeight: '600' },
-  emptyState: { alignItems: 'center', paddingVertical: spacing.xxxl * 2 },
-  emptyIcon: { fontSize: 48, marginBottom: spacing.lg },
-  emptyTitle: { ...typography.h3, color: colors.text, marginBottom: spacing.sm },
-  emptySubtitle: { ...typography.body, color: colors.textSecondary, textAlign: 'center' },
+  sectionTitle: { ...typography.sectionTitle, color: colors.text },
+  sectionAction: { ...typography.caption, color: colors.primary, fontWeight: '500' },
+  emptyState: { alignItems: 'center', paddingVertical: spacing['3xl'] },
+  emptyIcon: { fontSize: 32, marginBottom: spacing.lg, opacity: 0.4 },
+  emptyTitle: { ...typography.cardTitle, color: colors.text, marginBottom: spacing.xs },
+  emptySubtitle: { ...typography.caption, color: colors.textSecondary, textAlign: 'center', maxWidth: 260 },
 });

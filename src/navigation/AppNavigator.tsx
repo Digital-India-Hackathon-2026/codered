@@ -3,8 +3,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text, View, StyleSheet } from 'react-native';
+import FeatherIcon from 'react-native-vector-icons/Feather';
 import { useAuth } from '../context/AuthContext';
-import { colors, typography } from '../theme';
+import { colors, typography, spacing } from '../theme';
 
 // Auth Screens
 import { LoginScreen } from '../screens/auth/LoginScreen';
@@ -29,48 +30,37 @@ import { ProfileScreen } from '../screens/profile/ProfileScreen';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-const TabIcon = ({ icon, focused }: { icon: string; focused: boolean }) => (
-  <View style={[styles.tabIcon, focused && styles.tabIconActive]}>
-    <Text style={{ fontSize: 20 }}>{icon}</Text>
-  </View>
-);
+const TAB_ICONS: Record<string, string> = {
+  HomeTab: 'home',
+  TimelineTab: 'clock',
+  ChatTab: 'message-circle',
+  ReportsTab: 'file-text',
+  ProfileTab: 'user',
+};
 
 const MainTabs = () => (
   <Tab.Navigator
-    screenOptions={{
+    screenOptions={({ route }) => ({
       headerShown: false,
       tabBarStyle: styles.tabBar,
       tabBarActiveTintColor: colors.primary,
       tabBarInactiveTintColor: colors.textTertiary,
       tabBarLabelStyle: styles.tabLabel,
       tabBarHideOnKeyboard: true,
-    }}
+      tabBarIcon: ({ focused }) => (
+        <FeatherIcon
+          name={TAB_ICONS[route.name] || 'circle'}
+          size={20}
+          color={focused ? colors.primary : colors.textTertiary}
+        />
+      ),
+    })}
   >
-    <Tab.Screen
-      name="HomeTab"
-      component={HomeScreen}
-      options={{ tabBarLabel: 'Home', tabBarIcon: ({ focused }) => <TabIcon icon="🏠" focused={focused} /> }}
-    />
-    <Tab.Screen
-      name="TimelineTab"
-      component={TimelineScreen}
-      options={{ tabBarLabel: 'Timeline', tabBarIcon: ({ focused }) => <TabIcon icon="📅" focused={focused} /> }}
-    />
-    <Tab.Screen
-      name="ChatTab"
-      component={ChatScreen}
-      options={{ tabBarLabel: 'AI Chat', tabBarIcon: ({ focused }) => <TabIcon icon="🤖" focused={focused} /> }}
-    />
-    <Tab.Screen
-      name="ReportsTab"
-      component={ReportsScreen}
-      options={{ tabBarLabel: 'Reports', tabBarIcon: ({ focused }) => <TabIcon icon="📋" focused={focused} /> }}
-    />
-    <Tab.Screen
-      name="ProfileTab"
-      component={ProfileScreen}
-      options={{ tabBarLabel: 'Profile', tabBarIcon: ({ focused }) => <TabIcon icon="👤" focused={focused} /> }}
-    />
+    <Tab.Screen name="HomeTab" component={HomeScreen} options={{ tabBarLabel: 'Home' }} />
+    <Tab.Screen name="TimelineTab" component={TimelineScreen} options={{ tabBarLabel: 'Timeline' }} />
+    <Tab.Screen name="ChatTab" component={ChatScreen} options={{ tabBarLabel: 'Chat' }} />
+    <Tab.Screen name="ReportsTab" component={ReportsScreen} options={{ tabBarLabel: 'Reports' }} />
+    <Tab.Screen name="ProfileTab" component={ProfileScreen} options={{ tabBarLabel: 'Profile' }} />
   </Tab.Navigator>
 );
 
@@ -83,23 +73,21 @@ const AuthStack = () => (
 );
 
 const AppStack = () => (
-  <Stack.Navigator screenOptions={{ headerTintColor: colors.primary }}>
-    <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
-    <Stack.Screen name="ChatHistory" component={ChatHistoryScreen} options={{ headerShown: false }} />
-    <Stack.Screen name="ChatThread" component={ChatThreadScreen} options={{ headerShown: false }} />
-    <Stack.Screen name="MedicationsTab" component={MedicationsScreen} options={{ title: 'Medications' }} />
-    <Stack.Screen name="AddMedication" component={AddMedicationScreen} options={{ title: 'Add Medication' }} />
-    <Stack.Screen name="VitalsTab" component={VitalsScreen} options={{ title: 'Vitals' }} />
-    <Stack.Screen name="InsightsTab" component={InsightsScreen} options={{ title: 'Insights' }} />
-    <Stack.Screen name="AddEvent" component={AddEventScreen} options={{ title: 'Add Event' }} />
-    <Stack.Screen name="UploadReport" component={UploadReportScreen} options={{ title: 'Upload Report' }} />
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="Main" component={MainTabs} />
+    <Stack.Screen name="ChatHistory" component={ChatHistoryScreen} />
+    <Stack.Screen name="ChatThread" component={ChatThreadScreen} />
+    <Stack.Screen name="MedicationsTab" component={MedicationsScreen} />
+    <Stack.Screen name="AddMedication" component={AddMedicationScreen} />
+    <Stack.Screen name="VitalsTab" component={VitalsScreen} />
+    <Stack.Screen name="InsightsTab" component={InsightsScreen} />
+    <Stack.Screen name="AddEvent" component={AddEventScreen} />
+    <Stack.Screen name="UploadReport" component={UploadReportScreen} />
   </Stack.Navigator>
 );
 
-// Loading screen
 const LoadingScreen = () => (
   <View style={styles.loading}>
-    <Text style={{ fontSize: 48 }}>🔬</Text>
     <Text style={styles.loadingText}>LifeLens</Text>
   </View>
 );
@@ -118,16 +106,16 @@ export const AppNavigator = () => {
 
 const styles = StyleSheet.create({
   tabBar: {
-    height: 70,
+    height: 64,
     paddingBottom: 8,
     paddingTop: 8,
     backgroundColor: colors.surface,
     borderTopWidth: 1,
-    borderTopColor: colors.borderLight,
+    borderTopColor: colors.border,
+    elevation: 0,
+    shadowOpacity: 0,
   },
-  tabLabel: { ...typography.small, marginTop: 2 },
-  tabIcon: { padding: 4 },
-  tabIconActive: { transform: [{ scale: 1.1 }] },
+  tabLabel: { fontSize: 11, fontWeight: '500', marginTop: 2 },
   loading: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background },
-  loadingText: { ...typography.h1, color: colors.primary, marginTop: 12 },
+  loadingText: { ...typography.screenTitle, color: colors.text },
 });

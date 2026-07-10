@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
-import { Button, Input, Card } from '../../components/UI';
+import { View, Text, StyleSheet, Alert, Pressable } from 'react-native';
+import { Button, Input } from '../../components/UI';
+import { Icon } from '../../components/shared';
 import { reportsAPI } from '../../api/services';
-import { colors, spacing, typography, borderRadius } from '../../theme';
+import { colors, spacing, typography, radius } from '../../theme';
 
 const REPORT_TYPES = [
-  { key: 'blood_test', label: '🩸 Blood Test' },
-  { key: 'xray', label: '🦴 X-Ray' },
-  { key: 'mri', label: '🧠 MRI' },
-  { key: 'prescription', label: '💊 Prescription' },
-  { key: 'ecg', label: '❤️ ECG' },
-  { key: 'other', label: '📄 Other' },
+  { key: 'blood_test', icon: 'droplet', label: 'Blood Test' },
+  { key: 'xray', icon: 'image', label: 'X-Ray' },
+  { key: 'mri', icon: 'cpu', label: 'MRI' },
+  { key: 'prescription', icon: 'file-text', label: 'Prescription' },
+  { key: 'ecg', icon: 'activity', label: 'ECG' },
+  { key: 'other', icon: 'file', label: 'Other' },
 ];
 
 export const UploadReportScreen = ({ navigation }: any) => {
@@ -38,63 +39,66 @@ export const UploadReportScreen = ({ navigation }: any) => {
       formData.append('title', title || file.name);
       formData.append('type', type);
       await reportsAPI.upload(formData);
-      Alert.alert('Success', 'Report uploaded! AI analysis will begin shortly.', [
-        { text: 'OK', onPress: () => navigation.goBack() },
-      ]);
-    } catch {
-      Alert.alert('Error', 'Upload failed');
-    } finally { setUploading(false); }
+      Alert.alert('Success', 'Report uploaded.', [{ text: 'OK', onPress: () => navigation.goBack() }]);
+    } catch { Alert.alert('Error', 'Upload failed'); }
+    finally { setUploading(false); }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Upload Report</Text>
+    <View style={s.container}>
+      <Text style={s.title}>Upload Report</Text>
 
-      <Input label="Report Title (optional)" placeholder="e.g. CBC Blood Test - June 2025" value={title} onChangeText={setTitle} />
+      <Input label="Report Title (optional)" placeholder="e.g. CBC Blood Test" value={title} onChangeText={setTitle} />
 
-      <Text style={styles.label}>Report Type</Text>
-      <View style={styles.typeGrid}>
+      <Text style={s.label}>Report Type</Text>
+      <View style={s.typeGrid}>
         {REPORT_TYPES.map(t => (
-          <TouchableOpacity key={t.key} style={[styles.typeChip, type === t.key && styles.typeChipActive]} onPress={() => setType(t.key)}>
-            <Text style={[styles.typeText, type === t.key && { color: '#fff' }]}>{t.label}</Text>
-          </TouchableOpacity>
+          <Pressable key={t.key} style={[s.typeChip, type === t.key && s.typeChipActive]} onPress={() => setType(t.key)}>
+            <Icon name={t.icon} size={14} color={type === t.key ? '#FFF' : colors.textSecondary} />
+            <Text style={[s.typeText, type === t.key && { color: '#FFF' }]}>{t.label}</Text>
+          </Pressable>
         ))}
       </View>
 
-      <TouchableOpacity style={styles.filePicker} onPress={pickFile}>
+      <Pressable style={s.filePicker} onPress={pickFile}>
         {file ? (
-          <View style={styles.fileInfo}>
-            <Text style={styles.fileName}>{file.name}</Text>
-            <Text style={styles.fileSize}>{(file.size / 1024).toFixed(0)} KB</Text>
+          <View style={s.fileInfo}>
+            <Icon name="check-circle" size={20} color={colors.success} />
+            <Text style={s.fileName}>{file.name}</Text>
+            <Text style={s.fileSize}>{(file.size / 1024).toFixed(0)} KB</Text>
           </View>
         ) : (
-          <View style={styles.fileEmpty}>
-            <Text style={{ fontSize: 32 }}>📎</Text>
-            <Text style={styles.fileEmptyText}>Tap to select PDF or Image</Text>
+          <View style={s.fileEmpty}>
+            <Icon name="upload" size={24} color={colors.textTertiary} />
+            <Text style={s.fileEmptyText}>Tap to select PDF or image</Text>
           </View>
         )}
-      </TouchableOpacity>
+      </Pressable>
 
       <Button title="Upload & Analyze" onPress={handleUpload} loading={uploading} disabled={!file} />
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, padding: spacing.xxl },
-  title: { ...typography.h1, color: colors.text, marginBottom: spacing.xxl },
-  label: { ...typography.caption, color: colors.textSecondary, fontWeight: '600', marginBottom: spacing.sm },
+const s = StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.background, padding: spacing.xl },
+  title: { ...typography.screenTitle, color: colors.text, marginBottom: spacing.xl },
+  label: { ...typography.meta, color: colors.textSecondary, fontWeight: '500', marginBottom: spacing.sm },
   typeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.xl },
-  typeChip: { paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderRadius: borderRadius.full, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
-  typeChipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  typeText: { ...typography.caption, color: colors.textSecondary },
-  filePicker: {
-    borderWidth: 2, borderColor: colors.border, borderStyle: 'dashed',
-    borderRadius: borderRadius.lg, padding: spacing.xxl, marginBottom: spacing.xxl, alignItems: 'center',
+  typeChip: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.xs,
+    paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
+    borderRadius: radius.sm, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
   },
-  fileInfo: { alignItems: 'center' },
-  fileName: { ...typography.bodyBold, color: colors.text },
-  fileSize: { ...typography.caption, color: colors.textSecondary },
-  fileEmpty: { alignItems: 'center' },
-  fileEmptyText: { ...typography.body, color: colors.textTertiary, marginTop: spacing.sm },
+  typeChipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+  typeText: { ...typography.meta, color: colors.textSecondary },
+  filePicker: {
+    borderWidth: 1, borderColor: colors.border, borderStyle: 'dashed',
+    borderRadius: radius.md, padding: spacing.xl, marginBottom: spacing.xl, alignItems: 'center',
+  },
+  fileInfo: { alignItems: 'center', gap: spacing.xs },
+  fileName: { ...typography.cardTitle, color: colors.text },
+  fileSize: { ...typography.meta, color: colors.textTertiary },
+  fileEmpty: { alignItems: 'center', gap: spacing.sm },
+  fileEmptyText: { ...typography.caption, color: colors.textTertiary },
 });

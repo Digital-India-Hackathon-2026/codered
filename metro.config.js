@@ -1,4 +1,4 @@
-﻿// LifeLens - CodeRed Hackathon 2026`nconst { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
+const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
 
 /**
  * Metro configuration

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View, Text, StyleSheet, FlatList, Pressable, ActivityIndicator,
-} from 'react-native';
+import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Icon } from '../../components/shared';
+import { colors, spacing, radius, typography } from '../../theme';
 
 const AI_BASE = 'https://askfirst.co/api/ai';
 
@@ -17,9 +17,7 @@ export const ChatHistoryScreen = ({ navigation }: any) => {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchThreads();
-  }, []);
+  useEffect(() => { fetchThreads(); }, []);
 
   const fetchThreads = async () => {
     try {
@@ -30,69 +28,56 @@ export const ChatHistoryScreen = ({ navigation }: any) => {
           ...(token ? { Cookie: `session_token=${token}` } : {}),
         },
       });
-      const data = await res.json();
-      const filtered = (data.threads || []).filter((t: Thread) => t.user_message);
-      setThreads(filtered);
-    } catch {} finally {
-      setLoading(false);
-    }
+      const data: any = await res.json();
+      setThreads((data.threads || []).filter((t: Thread) => t.user_message));
+    } catch {} finally { setLoading(false); }
   };
 
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
     const now = new Date();
-    const diff = now.getTime() - d.getTime();
-    const days = Math.floor(diff / 86400000);
-    if (days === 0) return 'Today';
-    if (days === 1) return 'Yesterday';
-    if (days < 7) return `${days} days ago`;
+    const diff = Math.floor((now.getTime() - d.getTime()) / 86400000);
+    if (diff === 0) return 'Today';
+    if (diff === 1) return 'Yesterday';
+    if (diff < 7) return `${diff}d ago`;
     return d.toLocaleDateString();
   };
 
   const renderThread = ({ item }: { item: Thread }) => (
     <Pressable
-      style={styles.threadItem}
+      style={s.item}
       onPress={() => navigation.navigate('ChatThread', { threadId: item.id })}
     >
-      <View style={styles.threadIcon}>
-        <Text style={styles.threadIconText}>💬</Text>
+      <View style={s.itemIcon}>
+        <Icon name="message-circle" size={16} color={colors.textSecondary} />
       </View>
-      <View style={styles.threadContent}>
-        <Text style={styles.threadMessage} numberOfLines={2}>
-          {item.user_message}
-        </Text>
-        <Text style={styles.threadDate}>{formatDate(item.created_at)}</Text>
+      <View style={{ flex: 1 }}>
+        <Text style={s.itemMsg} numberOfLines={2}>{item.user_message}</Text>
+        <Text style={s.itemDate}>{formatDate(item.created_at)}</Text>
       </View>
+      <Icon name="chevron-right" size={16} color={colors.textTertiary} />
     </Pressable>
   );
 
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#2D7FF9" />
-      </View>
-    );
-  }
-
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <View style={s.container}>
+      <View style={s.header}>
         <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
-          <Text style={styles.backIcon}>‹</Text>
+          <Icon name="arrow-left" size={20} color={colors.text} />
         </Pressable>
-        <Text style={styles.headerTitle}>Chat History</Text>
-        <View style={{ width: 36 }} />
+        <Text style={s.headerTitle}>Chat History</Text>
+        <View style={{ width: 20 }} />
       </View>
-      {threads.length === 0 ? (
-        <View style={styles.center}>
-          <Text style={styles.emptyText}>No conversations yet</Text>
+      {threads.length === 0 && !loading ? (
+        <View style={s.empty}>
+          <Text style={s.emptyText}>No conversations yet</Text>
         </View>
       ) : (
         <FlatList
           data={threads}
           renderItem={renderThread}
           keyExtractor={item => item.id.toString()}
-          contentContainerStyle={styles.list}
+          contentContainerStyle={s.list}
           showsVerticalScrollIndicator={false}
         />
       )}
@@ -100,41 +85,27 @@ export const ChatHistoryScreen = ({ navigation }: any) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFFFFF' },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+const s = StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.background },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: spacing.lg, paddingVertical: spacing.md,
+    borderBottomWidth: 1, borderBottomColor: colors.border,
+    backgroundColor: colors.surface,
   },
-  backIcon: { fontSize: 32, color: '#111827', fontWeight: '300' },
-  headerTitle: { flex: 1, textAlign: 'center', fontSize: 17, fontWeight: '700', color: '#111827' },
-  list: { padding: 16 },
-  threadItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 12,
-    borderRadius: 14,
-    backgroundColor: '#F9FAFB',
-    marginBottom: 10,
+  headerTitle: { ...typography.cardTitle, color: colors.text, fontWeight: '600' },
+  list: { padding: spacing.lg },
+  item: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.md,
+    paddingVertical: spacing.md,
+    borderBottomWidth: 1, borderBottomColor: colors.border,
   },
-  threadIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#EAF4FF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
+  itemIcon: {
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: '#F4F4F5', justifyContent: 'center', alignItems: 'center',
   },
-  threadIconText: { fontSize: 18 },
-  threadContent: { flex: 1 },
-  threadMessage: { fontSize: 15, color: '#111827', fontWeight: '500', lineHeight: 20 },
-  threadDate: { fontSize: 12, color: '#6B7280', marginTop: 4 },
-  emptyText: { fontSize: 15, color: '#6B7280' },
+  itemMsg: { ...typography.body, color: colors.text },
+  itemDate: { ...typography.meta, color: colors.textTertiary, marginTop: 2 },
+  empty: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  emptyText: { ...typography.body, color: colors.textSecondary },
 });

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { Card, Badge, EmptyState } from '../../components/UI';
+import { Icon } from '../../components/shared';
 import { insightsAPI } from '../../api/services';
-import { colors, spacing, typography, borderRadius } from '../../theme';
+import { colors, spacing, typography, radius } from '../../theme';
 
 export const InsightsScreen = () => {
   const [risks, setRisks] = useState<any[]>([]);
@@ -24,85 +25,94 @@ export const InsightsScreen = () => {
   useEffect(() => { loadData(); }, []);
   const onRefresh = async () => { setRefreshing(true); await loadData(); setRefreshing(false); };
 
+  const getSeverityColor = (severity: string) => {
+    if (severity === 'high' || severity === 'critical') return colors.danger;
+    if (severity === 'moderate') return colors.warning;
+    return colors.textSecondary;
+  };
+
   return (
     <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      style={s.container}
+      contentContainerStyle={s.content}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.textTertiary} />}
     >
-      <Text style={styles.screenTitle}>Health Insights</Text>
-      <Text style={styles.subtitle}>AI-powered analysis based on your health data</Text>
+      <Text style={s.screenTitle}>Insights</Text>
+      <Text style={s.subtitle}>Based on your health data</Text>
 
-      {/* Risk Alerts */}
       {risks.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>⚠️ Risk Alerts</Text>
+        <View style={s.section}>
+          <View style={s.sectionHeader}>
+            <Icon name="alert-triangle" size={16} color={colors.danger} />
+            <Text style={s.sectionTitle}>Risk Alerts</Text>
+          </View>
           {risks.map((risk, i) => (
-            <Card key={i} style={{...styles.riskCard, borderLeftColor: colors.severity[risk.severity as keyof typeof colors.severity] || colors.warning}}>
-              <View style={styles.riskHeader}>
-                <Text style={styles.riskTitle}>{risk.title}</Text>
-                <Badge text={risk.severity} color={colors.severity[risk.severity as keyof typeof colors.severity] || colors.warning} />
+            <Card key={i} style={{...s.riskCard, borderLeftColor: getSeverityColor(risk.severity)}}>
+              <View style={s.riskHeader}>
+                <Text style={s.riskTitle}>{risk.title}</Text>
+                <Badge text={risk.severity} color={getSeverityColor(risk.severity)} />
               </View>
-              <Text style={styles.riskBody}>{risk.description}</Text>
-              {risk.action && <Text style={styles.riskAction}>→ {risk.action}</Text>}
+              <Text style={s.riskBody}>{risk.description}</Text>
+              {risk.action && <Text style={s.riskAction}>{risk.action}</Text>}
             </Card>
           ))}
         </View>
       )}
 
-      {/* Checkups Due */}
       {checkups.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📅 Checkups Due</Text>
+        <View style={s.section}>
+          <View style={s.sectionHeader}>
+            <Icon name="calendar" size={16} color={colors.textSecondary} />
+            <Text style={s.sectionTitle}>Checkups Due</Text>
+          </View>
           {checkups.map((item, i) => (
-            <Card key={i} style={styles.checkupCard}>
-              <Text style={styles.checkupName}>{item.name}</Text>
-              <Text style={styles.checkupInfo}>Last: {item.last_done || 'Never'} • Recommended: {item.frequency}</Text>
+            <Card key={i} style={s.checkupCard}>
+              <Text style={s.checkupName}>{item.name}</Text>
+              <Text style={s.checkupInfo}>Last: {item.last_done || 'Never'} · {item.frequency}</Text>
             </Card>
           ))}
         </View>
       )}
 
-      {/* Recommendations */}
       {recommendations.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>💡 Recommendations</Text>
+        <View style={s.section}>
+          <View style={s.sectionHeader}>
+            <Icon name="info" size={16} color={colors.textSecondary} />
+            <Text style={s.sectionTitle}>Recommendations</Text>
+          </View>
           {recommendations.map((rec, i) => (
-            <Card key={i} style={styles.recCard}>
-              <Text style={styles.recIcon}>{rec.icon || '💡'}</Text>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.recTitle}>{rec.title}</Text>
-                <Text style={styles.recBody}>{rec.description}</Text>
-              </View>
+            <Card key={i} style={s.recCard}>
+              <Text style={s.recTitle}>{rec.title}</Text>
+              <Text style={s.recBody}>{rec.description}</Text>
             </Card>
           ))}
         </View>
       )}
 
       {risks.length === 0 && recommendations.length === 0 && checkups.length === 0 && (
-        <EmptyState icon="🧠" title="No insights yet" subtitle="Add health data to get personalized insights" />
+        <EmptyState icon="" title="No insights yet" subtitle="Add health data to get personalized insights" />
       )}
     </ScrollView>
   );
 };
 
-const styles = StyleSheet.create({
+const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.lg, paddingBottom: 100 },
-  screenTitle: { ...typography.h1, color: colors.text },
-  subtitle: { ...typography.body, color: colors.textSecondary, marginBottom: spacing.xl },
-  section: { marginBottom: spacing.xxl },
-  sectionTitle: { ...typography.h3, color: colors.text, marginBottom: spacing.md },
-  riskCard: { marginBottom: spacing.sm, borderLeftWidth: 4 },
+  content: { padding: spacing.lg, paddingTop: spacing['2xl'], paddingBottom: 100 },
+  screenTitle: { ...typography.screenTitle, color: colors.text },
+  subtitle: { ...typography.caption, color: colors.textSecondary, marginBottom: spacing.xl },
+  section: { marginBottom: spacing.xl },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.md },
+  sectionTitle: { ...typography.sectionTitle, color: colors.text },
+  riskCard: { marginBottom: spacing.sm, borderLeftWidth: 3 },
   riskHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.xs },
-  riskTitle: { ...typography.bodyBold, color: colors.text, flex: 1 },
+  riskTitle: { ...typography.cardTitle, color: colors.text, flex: 1 },
   riskBody: { ...typography.caption, color: colors.textSecondary },
-  riskAction: { ...typography.caption, color: colors.primary, fontWeight: '600', marginTop: spacing.sm },
+  riskAction: { ...typography.caption, color: colors.primary, fontWeight: '500', marginTop: spacing.sm },
   checkupCard: { marginBottom: spacing.sm },
-  checkupName: { ...typography.bodyBold, color: colors.text },
-  checkupInfo: { ...typography.caption, color: colors.textSecondary, marginTop: 2 },
-  recCard: { marginBottom: spacing.sm, flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md },
-  recIcon: { fontSize: 24 },
-  recTitle: { ...typography.bodyBold, color: colors.text },
+  checkupName: { ...typography.cardTitle, color: colors.text },
+  checkupInfo: { ...typography.meta, color: colors.textTertiary, marginTop: 2 },
+  recCard: { marginBottom: spacing.sm },
+  recTitle: { ...typography.cardTitle, color: colors.text },
   recBody: { ...typography.caption, color: colors.textSecondary, marginTop: 2 },
 });

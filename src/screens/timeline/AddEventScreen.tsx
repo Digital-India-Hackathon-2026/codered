@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import { Button, Input } from '../../components/UI';
+import { Icon } from '../../components/shared';
 import { timelineAPI } from '../../api/services';
-import { colors, spacing, typography, borderRadius } from '../../theme';
+import { colors, spacing, typography, radius } from '../../theme';
 
 const EVENT_TYPES = [
-  { key: 'symptom', icon: '🤒', label: 'Symptom' },
-  { key: 'consultation', icon: '👨⚕️', label: 'Consultation' },
-  { key: 'vaccination', icon: '💉', label: 'Vaccination' },
-  { key: 'surgery', icon: '🏥', label: 'Surgery' },
-  { key: 'wellness', icon: '🧘', label: 'Wellness' },
-  { key: 'medication_change', icon: '💊', label: 'Med Change' },
+  { key: 'symptom', icon: 'thermometer', label: 'Symptom' },
+  { key: 'consultation', icon: 'user', label: 'Consultation' },
+  { key: 'vaccination', icon: 'shield', label: 'Vaccination' },
+  { key: 'surgery', icon: 'scissors', label: 'Surgery' },
+  { key: 'wellness', icon: 'heart', label: 'Wellness' },
+  { key: 'medication_change', icon: 'package', label: 'Med Change' },
 ];
 
 export const AddEventScreen = ({ navigation }: any) => {
@@ -31,16 +32,16 @@ export const AddEventScreen = ({ navigation }: any) => {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Add Event</Text>
+    <ScrollView style={s.container} contentContainerStyle={s.content}>
+      <Text style={s.title}>Add Event</Text>
 
-      <Text style={styles.label}>Event Type</Text>
-      <View style={styles.typeGrid}>
+      <Text style={s.label}>Event Type</Text>
+      <View style={s.typeGrid}>
         {EVENT_TYPES.map(t => (
-          <TouchableOpacity key={t.key} style={[styles.typeCard, type === t.key && styles.typeCardActive]} onPress={() => setType(t.key)}>
-            <Text style={{ fontSize: 24 }}>{t.icon}</Text>
-            <Text style={[styles.typeLabel, type === t.key && { color: '#fff' }]}>{t.label}</Text>
-          </TouchableOpacity>
+          <Pressable key={t.key} style={[s.typeCard, type === t.key && s.typeCardActive]} onPress={() => setType(t.key)}>
+            <Icon name={t.icon} size={20} color={type === t.key ? '#FFF' : colors.textSecondary} />
+            <Text style={[s.typeLabel, type === t.key && { color: '#FFF' }]}>{t.label}</Text>
+          </Pressable>
         ))}
       </View>
 
@@ -53,16 +54,16 @@ export const AddEventScreen = ({ navigation }: any) => {
   );
 };
 
-const styles = StyleSheet.create({
+const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.xxl, paddingBottom: 100 },
-  title: { ...typography.h1, color: colors.text, marginBottom: spacing.xxl },
-  label: { ...typography.caption, color: colors.textSecondary, fontWeight: '600', marginBottom: spacing.sm },
+  content: { padding: spacing.xl, paddingBottom: 100 },
+  title: { ...typography.screenTitle, color: colors.text, marginBottom: spacing.xl },
+  label: { ...typography.meta, color: colors.textSecondary, fontWeight: '500', marginBottom: spacing.sm },
   typeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.xl },
   typeCard: {
-    width: '30%', alignItems: 'center', padding: spacing.md,
-    borderRadius: borderRadius.md, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
+    width: '30%', alignItems: 'center', padding: spacing.md, gap: spacing.sm,
+    borderRadius: radius.sm, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
   },
   typeCardActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  typeLabel: { ...typography.small, color: colors.textSecondary, marginTop: spacing.xs },
+  typeLabel: { ...typography.meta, color: colors.textSecondary },
 });
