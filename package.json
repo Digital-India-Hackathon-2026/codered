@@ -1,4 +1,4 @@
-{
+﻿// LifeLens - CodeRed Hackathon 2026`n{
   "name": "LifeLens",
   "version": "0.0.1",
   "private": true,
@@ -60,3 +60,4 @@
     "node": ">= 22.11.0"
   }
 }
+
