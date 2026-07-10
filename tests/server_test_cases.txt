@@ -1,0 +1,110 @@
+LifeLens / CodeRed test case document for server.py
+Generated on 2026-07-10
+
+This file contains detailed manual and automated-ready test cases for the FastAPI backend entry points.
+
+TC-001: Root endpoint returns HTML response
+TC-002: Root endpoint serves fallback HTML when template is missing
+TC-003: Upload endpoint rejects non-PDF files
+TC-004: Upload endpoint accepts a valid PDF file
+TC-005: Upload endpoint stores the uploaded file in the upload directory
+TC-006: Upload endpoint includes chunk count in the response
+TC-007: Upload endpoint tags uploaded chunks with the provided year
+TC-008: Upload endpoint handles pipeline failure gracefully
+TC-009: /chunks returns an empty collection before indexing
+TC-010: /chunks returns indexed chunks after upload
+TC-011: /query returns direct generation when no documents are indexed
+TC-012: /query uses direct generation fallback without evaluation data
+TC-013: /query uses retrieval pipeline when documents are indexed
+TC-014: /query returns the correct query payload in the response
+TC-015: /query includes evaluation data when reference answer is provided
+TC-016: /query handles missing reference answer gracefully
+TC-017: /query returns HTTP 500 when the pipeline raises an error
+TC-018: Upload endpoint uses the correct upload directory name
+TC-019: Upload endpoint preserves the original filename on disk
+TC-020: /chunks endpoint returns serializable data for the UI
+TC-021: Query endpoint uses the top-k selection limit of five chunks
+TC-022: Query endpoint keeps MPR outputs available for diagnostics
+TC-023: Query endpoint uses the requested query year in re-ranking
+TC-024: Query endpoint should not crash when the vector store is empty
+TC-025: Upload endpoint should create the upload directory on startup
+TC-026: The server exposes the expected FastAPI app instance
+TC-027: The app should include CORS middleware configured for development
+TC-028: Query endpoint should preserve the original query text
+TC-029: Query endpoint should return deterministic structure
+TC-030: Upload endpoint should log a clear upload message
+TC-031: Root endpoint should return 200 for a normal GET request
+TC-032: Root endpoint should include a title tag in the HTML
+TC-033: Upload endpoint should reject empty filenames
+TC-034: Upload endpoint should reject files larger than the configured limit
+TC-035: Upload endpoint should normalize document year values
+TC-036: Upload endpoint should preserve metadata when a chunk is created
+TC-037: Upload endpoint should expose the original file name in the response
+TC-038: Upload endpoint should return a structured success payload
+TC-039: Upload endpoint should support multipart form data
+TC-040: Upload endpoint should reject missing file parts
+TC-041: /chunks endpoint should return a stable JSON schema
+TC-042: /chunks endpoint should include chunk count before any indexing
+TC-043: /chunks endpoint should include chunk entries after indexing
+TC-044: /query endpoint should support both empty and populated vector stores
+TC-045: /query endpoint should return an answer even when retrieval fails
+TC-046: /query endpoint should preserve the query_year in all responses
+TC-047: /query endpoint should include a diagnostic object for debugging
+TC-048: /query endpoint should limit the number of returned selected chunks
+TC-049: /query endpoint should maintain the original query order
+TC-050: /query endpoint should return a consistent error envelope
+TC-051: /query endpoint should allow reference answers with whitespace
+TC-052: /query endpoint should handle null query values safely
+TC-053: /query endpoint should handle unicode query strings
+TC-054: /query endpoint should support repeated query submissions
+TC-055: /query endpoint should trim long queries before processing
+TC-056: /query endpoint should not require reference_answer for a basic request
+TC-057: /query endpoint should use the fallback path when the vector store is empty
+TC-058: /query endpoint should execute the retrieval path when chunks exist
+TC-059: /query endpoint should surface any generator exception clearly
+TC-060: /query endpoint should surface any retriever exception clearly
+TC-061: /query endpoint should surface any reranker exception clearly
+TC-062: /query endpoint should keep diagnostic arrays aligned with the response model
+TC-063: /query endpoint should return the expected top-level keys
+TC-064: /query endpoint should be safe for cross-request state isolation
+TC-065: /query endpoint should support concurrent requests without shared corruption
+TC-066: /query endpoint should preserve the exact query text in the response
+TC-067: /query endpoint should include an empty diagnostic selection when no chunks are found
+TC-068: /query endpoint should avoid duplicate entries in diagnostics
+TC-069: Server startup should create the upload directory automatically
+TC-070: Server startup should create the templates directory automatically
+TC-071: Server startup should create the static directory automatically
+TC-072: The app object should be importable from the server module path
+TC-073: CORS middleware should allow the OPTIONS preflight route
+TC-074: CORS middleware should accept headers sent by the frontend
+TC-075: CORS middleware should allow all common methods
+TC-076: Upload endpoint should reject unsupported content types
+TC-077: Upload endpoint should reject directories instead of files
+TC-078: Upload endpoint should handle an empty PDF file gracefully
+TC-079: Upload endpoint should return a friendly message for parse failure
+TC-080: Upload endpoint should log the saved file path
+TC-081: /chunks endpoint should be safe after a failed upload
+TC-082: /chunks endpoint should return the same shape in repeated calls
+TC-083: /query endpoint should support a reference answer that is empty string
+TC-084: /query endpoint should support a reference answer with newline content
+TC-085: /query endpoint should keep the response stable when query_year is omitted
+TC-086: /query endpoint should accept a query_year of zero for a boundary case
+TC-087: /query endpoint should accept a very large query_year value
+TC-088: /query endpoint should preserve the request object shape in logs
+TC-089: /query endpoint should avoid mutating the input request object
+TC-090: /query endpoint should return the correct diagnostic count field
+TC-091: /query endpoint should use the configured top_k constant consistently
+TC-092: /query endpoint should not return more than five selected chunks
+TC-093: /query endpoint should return an empty selected chunk list when retrieval is empty
+TC-094: /query endpoint should continue to work with a partially initialized pipeline
+TC-095: /query endpoint should surface generator output in a simple string field
+TC-096: /query endpoint should join retrieval details cleanly for UI debugging
+TC-097: /query endpoint should keep fallback response fields aligned
+TC-098: /query endpoint should remain healthy in a pure unit test environment
+TC-099: /query endpoint should preserve original casing in the request query
+TC-100: /query endpoint should handle whitespace-only query text safely
+TC-101: Server module should be importable without a configured environment file
+TC-102: Server module should not crash if optional template content is missing
+TC-103: Server module should expose the app title in the configuration
+TC-104: Server module should keep the upload path relative to the workspace
+TC-105: Server module should be safe to import during automated test collection

@@ -1,0 +1,110 @@
+LifeLens / CodeRed test case document for src/utils/helpers.ts
+Generated on 2026-07-10
+
+This file contains detailed unit test scenarios for the helper utilities that support the app.
+
+TC-001: Helper module loads without runtime errors
+TC-002: A helper utility should preserve data when no transformations are applied
+TC-003: Helper functions should return empty values for null input
+TC-004: Helper functions should handle empty strings safely
+TC-005: Helper functions should trim whitespace from user input
+TC-006: Helper functions should normalize case for comparison operations
+TC-007: Helper functions should support arrays of values
+TC-008: Helper functions should reject invalid data types gracefully
+TC-009: Helper functions should preserve object keys when mapping data
+TC-010: Helper functions should support repeated calls without state leakage
+TC-011: Helper functions should be deterministic for identical inputs
+TC-012: Helper functions should handle large input lists without changing semantics
+TC-013: Helper functions should support nested values when required
+TC-014: Helper functions should not mutate the original input when returning a transformed value
+TC-015: Helper functions should return a default value for unsupported input
+TC-016: Helper functions should support boolean toggling logic
+TC-017: Helper functions should handle decimal values without rounding errors when not intended
+TC-018: Helper functions should format output for UI presentation
+TC-019: Helper functions should support empty arrays gracefully
+TC-020: Helper functions should ignore unknown fields when sanitizing input
+TC-021: Helper functions should preserve order when processing a list
+TC-022: Helper functions should handle duplicate entries consistently
+TC-023: Helper functions should return the correct type for each branch
+TC-024: Helper functions should be safe for concurrent use in repeated tests
+TC-025: Helper functions should support unicode content
+TC-026: Helper functions should remove surrounding whitespace from values
+TC-027: Helper functions should respond correctly to falsey values
+TC-028: Helper functions should preserve numeric values as numbers
+TC-029: Helper functions should support optional parameters cleanly
+TC-030: Helper functions should validate that the returned structure is serializable
+TC-031: Helper functions should not throw on missing nested properties
+TC-032: Helper functions should expose a clear and predictable contract for consumers
+TC-033: Helper functions should work with object values containing null fields
+TC-034: Helper functions should handle undefined properties safely
+TC-035: Helper functions should support strings with internal whitespace
+TC-036: Helper functions should return a stable object shape for repeated use
+TC-037: Helper functions should preserve dates when passed through identity paths
+TC-038: Helper functions should support labels and titles without mutation
+TC-039: Helper functions should avoid accidental string coercion
+TC-040: Helper functions should support mixed-case slugs and ids
+TC-041: Helper functions should maintain sorting order for alphabetical data
+TC-042: Helper functions should handle emoji and punctuation without errors
+TC-043: Helper functions should return false for empty collections in boolean branches
+TC-044: Helper functions should return true for populated collections in boolean branches
+TC-045: Helper functions should work with numeric zeros and negative values
+TC-046: Helper functions should support partial objects with missing keys
+TC-047: Helper functions should be safe with deeply nested arrays
+TC-048: Helper functions should preserve the original array length when mapping
+TC-049: Helper functions should avoid duplicate objects when not requested
+TC-050: Helper functions should be consistent across repeated mapping operations
+TC-051: Helper functions should support objects with inherited properties
+TC-052: Helper functions should ignore null array entries when present
+TC-053: Helper functions should preserve key order in objects
+TC-054: Helper functions should be safe for empty string arrays
+TC-055: Helper functions should not mutate array order by default
+TC-056: Helper functions should work with sparse arrays if encountered
+TC-057: Helper functions should support string concatenation without hidden transforms
+TC-058: Helper functions should remain deterministic with same input order
+TC-059: Helper functions should support multiline strings gracefully
+TC-060: Helper functions should preserve booleans and avoid truthy coercion bugs
+TC-061: Helper functions should treat false as a meaningful input value
+TC-062: Helper functions should support object values with nested arrays
+TC-063: Helper functions should handle values from forms and query parameters
+TC-064: Helper functions should return a normalized default for unknown enums
+TC-065: Helper functions should be safe to run in a server-side environment
+TC-066: Helper functions should remain workable in browser-like environments
+TC-067: Helper functions should avoid leaking internal state across tests
+TC-068: Helper functions should preserve symbols if passed through an identity path
+TC-069: Helper functions should support simple date strings without errors
+TC-070: Helper functions should work with URLs and path separators
+TC-071: Helper functions should preserve decimal formatting when required
+TC-072: Helper functions should not remove meaningful punctuation from values
+TC-073: Helper functions should support simple markdown-like strings
+TC-074: Helper functions should handle very long strings safely
+TC-075: Helper functions should work with numeric strings as well as numbers
+TC-076: Helper functions should preserve empty objects
+TC-077: Helper functions should support objects with boolean flags
+TC-078: Helper functions should support all-lowercase and all-uppercase values
+TC-079: Helper functions should not throw for whitespace-only arrays
+TC-080: Helper functions should be compatible with serialization libraries
+TC-081: Helper functions should support values from API payloads
+TC-082: Helper functions should not mutate nested objects by default
+TC-083: Helper functions should preserve additional properties unless explicitly removed
+TC-084: Helper functions should support fallback values for absent properties
+TC-085: Helper functions should return the same result for equivalent input objects
+TC-086: Helper functions should support optional chaining-compatible inputs
+TC-087: Helper functions should be safe for use with disabled features or flags
+TC-088: Helper functions should support simple localization-friendly strings
+TC-089: Helper functions should support strings with numbers and letters mixed together
+TC-090: Helper functions should avoid surprising behavior with nullish values
+TC-091: Helper functions should support environment-variable-like strings
+TC-092: Helper functions should preserve duplicates when duplicates are meaningful
+TC-093: Helper functions should support global constants and enums in values
+TC-094: Helper functions should sanitize empty values in list-based input
+TC-095: Helper functions should support health-related text like symptoms and conditions
+TC-096: Helper functions should maintain object field names when mapping
+TC-097: Helper functions should accept arrays of objects and return arrays of objects
+TC-098: Helper functions should support basic filtering semantics in future implementations
+TC-099: Helper functions should handle string values with tab and newline characters
+TC-100: Helper functions should be robust for onboarding and smoke tests
+TC-101: Helper functions should expose a minimal public surface area
+TC-102: Helper functions should allow future refactoring without changing their consumers
+TC-103: Helper functions should be understandable for new contributors
+TC-104: Helper functions should have predictable handling for invalid input types
+TC-105: Helper functions should remain valid as a utility layer for the app
