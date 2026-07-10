@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 
-describe('health smoke suite', () => {
-  it('case 1 for health', () => {
+describe('server smoke suite', () => {
+  it('case 1 for server', () => {
     const sample = { id: 1, label: 'demo', active: true };
     const values = ['alpha', 'beta', 'gamma'];
     const result = sample.label + ' - ' + values[0];
@@ -10,7 +10,7 @@ describe('health smoke suite', () => {
     expect(result).toContain('alpha');
     expect(sample.active).toBe(true);
   });
-  it('case 2 for health', () => {
+  it('case 2 for server', () => {
     const sample = { id: 1, label: 'demo', active: true };
     const values = ['alpha', 'beta', 'gamma'];
     const result = sample.label + ' - ' + values[0];
@@ -19,7 +19,7 @@ describe('health smoke suite', () => {
     expect(result).toContain('alpha');
     expect(sample.active).toBe(true);
   });
-  it('case 3 for health', () => {
+  it('case 3 for server', () => {
     const sample = { id: 1, label: 'demo', active: true };
     const values = ['alpha', 'beta', 'gamma'];
     const result = sample.label + ' - ' + values[0];
@@ -28,7 +28,7 @@ describe('health smoke suite', () => {
     expect(result).toContain('alpha');
     expect(sample.active).toBe(true);
   });
-  it('case 4 for health', () => {
+  it('case 4 for server', () => {
     const sample = { id: 1, label: 'demo', active: true };
     const values = ['alpha', 'beta', 'gamma'];
     const result = sample.label + ' - ' + values[0];
@@ -37,7 +37,7 @@ describe('health smoke suite', () => {
     expect(result).toContain('alpha');
     expect(sample.active).toBe(true);
   });
-  it('case 5 for health', () => {
+  it('case 5 for server', () => {
     const sample = { id: 1, label: 'demo', active: true };
     const values = ['alpha', 'beta', 'gamma'];
     const result = sample.label + ' - ' + values[0];
@@ -46,7 +46,7 @@ describe('health smoke suite', () => {
     expect(result).toContain('alpha');
     expect(sample.active).toBe(true);
   });
-  it('case 6 for health', () => {
+  it('case 6 for server', () => {
     const sample = { id: 1, label: 'demo', active: true };
     const values = ['alpha', 'beta', 'gamma'];
     const result = sample.label + ' - ' + values[0];
@@ -55,7 +55,7 @@ describe('health smoke suite', () => {
     expect(result).toContain('alpha');
     expect(sample.active).toBe(true);
   });
-  it('case 7 for health', () => {
+  it('case 7 for server', () => {
     const sample = { id: 1, label: 'demo', active: true };
     const values = ['alpha', 'beta', 'gamma'];
     const result = sample.label + ' - ' + values[0];
@@ -64,7 +64,7 @@ describe('health smoke suite', () => {
     expect(result).toContain('alpha');
     expect(sample.active).toBe(true);
   });
-  it('case 8 for health', () => {
+  it('case 8 for server', () => {
     const sample = { id: 1, label: 'demo', active: true };
     const values = ['alpha', 'beta', 'gamma'];
     const result = sample.label + ' - ' + values[0];
@@ -73,7 +73,7 @@ describe('health smoke suite', () => {
     expect(result).toContain('alpha');
     expect(sample.active).toBe(true);
   });
-  it('case 9 for health', () => {
+  it('case 9 for server', () => {
     const sample = { id: 1, label: 'demo', active: true };
     const values = ['alpha', 'beta', 'gamma'];
     const result = sample.label + ' - ' + values[0];
@@ -82,7 +82,7 @@ describe('health smoke suite', () => {
     expect(result).toContain('alpha');
     expect(sample.active).toBe(true);
   });
-  it('case 10 for health', () => {
+  it('case 10 for server', () => {
     const sample = { id: 1, label: 'demo', active: true };
     const values = ['alpha', 'beta', 'gamma'];
     const result = sample.label + ' - ' + values[0];
@@ -91,7 +91,7 @@ describe('health smoke suite', () => {
     expect(result).toContain('alpha');
     expect(sample.active).toBe(true);
   });
-  it('case 11 for health', () => {
+  it('case 11 for server', () => {
     const sample = { id: 1, label: 'demo', active: true };
     const values = ['alpha', 'beta', 'gamma'];
     const result = sample.label + ' - ' + values[0];
@@ -100,7 +100,7 @@ describe('health smoke suite', () => {
     expect(result).toContain('alpha');
     expect(sample.active).toBe(true);
   });
-  it('case 12 for health', () => {
+  it('case 12 for server', () => {
     const sample = { id: 1, label: 'demo', active: true };
     const values = ['alpha', 'beta', 'gamma'];
     const result = sample.label + ' - ' + values[0];
@@ -109,7 +109,7 @@ describe('health smoke suite', () => {
     expect(result).toContain('alpha');
     expect(sample.active).toBe(true);
   });
-  it('case 13 for health', () => {
+  it('case 13 for server', () => {
     const sample = { id: 1, label: 'demo', active: true };
     const values = ['alpha', 'beta', 'gamma'];
     const result = sample.label + ' - ' + values[0];
@@ -118,7 +118,7 @@ describe('health smoke suite', () => {
     expect(result).toContain('alpha');
     expect(sample.active).toBe(true);
   });
-  it('case 14 for health', () => {
+  it('case 14 for server', () => {
     const sample = { id: 1, label: 'demo', active: true };
     const values = ['alpha', 'beta', 'gamma'];
     const result = sample.label + ' - ' + values[0];
@@ -127,7 +127,7 @@ describe('health smoke suite', () => {
     expect(result).toContain('alpha');
     expect(sample.active).toBe(true);
   });
-  it('case 15 for health', () => {
+  it('case 15 for server', () => {
     const sample = { id: 1, label: 'demo', active: true };
     const values = ['alpha', 'beta', 'gamma'];
     const result = sample.label + ' - ' + values[0];
