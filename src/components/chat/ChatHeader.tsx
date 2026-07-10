@@ -1,50 +1,67 @@
 import React, { memo } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { Icon } from '../shared';
-import { colors, spacing, typography, radius } from '../../theme';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import ClaryOrb from '../shared/ClaryOrb';
+import { Icon } from '../shared/Icon';
+import { colors, fonts, radius } from '../../theme';
 
 interface ChatHeaderProps {
   onBack?: () => void;
   onMenu?: () => void;
+  onNewChat?: () => void;
 }
 
-export const ChatHeader: React.FC<ChatHeaderProps> = memo(({ onBack, onMenu }) => (
-  <View style={s.container}>
-    {onBack && (
-      <Pressable onPress={onBack} hitSlop={12} style={s.btn}>
-        <Icon name="arrow-left" size={20} color={colors.text} />
-      </Pressable>
-    )}
-    <View style={s.center}>
-      <View style={s.avatar}>
-        <Icon name="cpu" size={14} color={colors.primary} />
+export const ChatHeader: React.FC<ChatHeaderProps> = memo(({ onBack, onMenu, onNewChat }) => (
+  <SafeAreaView edges={['top']} style={s.safe}>
+    <View style={s.container}>
+      {onBack && (
+        <Pressable onPress={onBack} hitSlop={12} style={s.btn}>
+          <Icon name="CaretLeft" size={20} color={colors.text} weight="bold" />
+        </Pressable>
+      )}
+      <View style={s.center}>
+        <ClaryOrb size={28} glow={false} />
+        <View>
+          <Text style={s.name}>Clary</Text>
+          <View style={s.statusRow}>
+            <View style={s.statusDot} />
+            <Text style={s.status}>Online</Text>
+          </View>
+        </View>
       </View>
-      <View>
-        <Text style={s.name}>Clary</Text>
-        <Text style={s.status}>Online</Text>
-      </View>
+      <View style={{ flex: 1 }} />
+
+      {/* New Chat */}
+      {onNewChat && (
+        <Pressable onPress={onNewChat} hitSlop={12} style={s.btn}>
+          <Icon name="PencilSimpleLine" size={20} color={colors.textSecondary} weight="regular" />
+        </Pressable>
+      )}
+
+      {/* History */}
+      {onMenu && (
+        <Pressable onPress={onMenu} hitSlop={12} style={s.btn}>
+          <Icon name="ClockCounterClockwise" size={20} color={colors.textSecondary} weight="regular" />
+        </Pressable>
+      )}
     </View>
-    {onMenu && (
-      <Pressable onPress={onMenu} hitSlop={12} style={s.btn}>
-        <Icon name="clock" size={18} color={colors.textSecondary} />
-      </Pressable>
-    )}
-  </View>
+  </SafeAreaView>
 ));
 
 const s = StyleSheet.create({
+  safe: { backgroundColor: colors.surface },
   container: {
-    flexDirection: 'row', alignItems: 'center',
-    paddingHorizontal: spacing.lg, paddingVertical: spacing.md,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1, borderBottomColor: colors.border,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
-  btn: { width: 36, height: 36, justifyContent: 'center', alignItems: 'center' },
-  center: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginLeft: spacing.sm },
-  avatar: {
-    width: 32, height: 32, borderRadius: 16,
-    backgroundColor: colors.primaryMuted, justifyContent: 'center', alignItems: 'center',
-  },
-  name: { ...typography.cardTitle, color: colors.text, fontWeight: '600' },
-  status: { ...typography.meta, color: colors.success },
+  btn: { width: 34, height: 34, justifyContent: 'center', alignItems: 'center' },
+  center: { flexDirection: 'row', alignItems: 'center', gap: 10, marginLeft: 4 },
+  name: { fontFamily: fonts.generalSans.semiBold, fontSize: 15, color: colors.text },
+  statusRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 1 },
+  statusDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.sage },
+  status: { fontFamily: fonts.generalSans.medium, fontSize: 11, color: colors.sage },
 });

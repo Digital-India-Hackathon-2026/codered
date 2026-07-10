@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Pressable } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { Icon, PillBadge } from '../shared';
-import { colors, spacing, radius, typography } from '../../theme';
+import { colors, spacing, radius, shadows, typography } from '../../theme';
 
 // ─── Permission Card ───
 interface PermissionCardProps { title: string; content: string; onAccept: () => void; onDecline: () => void; }
@@ -199,55 +199,55 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({ severity, hypothesis, 
 // ─── Styles ───
 const s = StyleSheet.create({
   // Permission
-  permCard: { marginHorizontal: spacing.lg, marginBottom: spacing.md, backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.xl, borderWidth: 1, borderColor: colors.border },
+  permCard: { marginHorizontal: spacing.lg, marginBottom: spacing.md, backgroundColor: colors.surface, borderRadius: radius.xl, padding: spacing.lg, borderWidth: 1, borderColor: colors.border, ...shadows.sm },
   permTitle: { ...typography.sectionTitle, color: colors.text, marginTop: spacing.md, marginBottom: spacing.sm },
   permDesc: { ...typography.body, color: colors.textSecondary, marginBottom: spacing.sm },
   permTime: { ...typography.meta, color: colors.textTertiary, marginBottom: spacing.lg },
   permBenefits: { marginBottom: spacing.xl, gap: spacing.sm },
   benefitRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   permBenefit: { ...typography.body, color: colors.success, fontWeight: '500' },
-  permPrimaryBtn: { backgroundColor: colors.primary, borderRadius: radius.sm, paddingVertical: 14, alignItems: 'center', marginBottom: spacing.sm },
+  permPrimaryBtn: { backgroundColor: colors.primary, borderRadius: radius.lg, paddingVertical: 14, alignItems: 'center', marginBottom: spacing.sm },
   permPrimaryText: { ...typography.cardTitle, color: '#FFF' },
   permGhostBtn: { alignItems: 'center', paddingVertical: spacing.sm },
   permGhostText: { ...typography.body, color: colors.textSecondary },
 
   // Question Card
-  qCard: { marginHorizontal: spacing.lg, marginBottom: spacing.md, backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.xl, borderWidth: 1, borderColor: colors.border },
+  qCard: { marginHorizontal: spacing.lg, marginBottom: spacing.md, backgroundColor: colors.surface, borderRadius: radius.xl, padding: spacing.lg, borderWidth: 1, borderColor: colors.border, ...shadows.sm },
   qText: { ...typography.cardTitle, color: colors.text, lineHeight: 24, marginTop: spacing.md, marginBottom: spacing.lg },
   multiHint: { ...typography.caption, color: colors.textSecondary, marginBottom: spacing.md },
   optionsWrap: { gap: spacing.sm },
-  optionChip: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: colors.border, borderRadius: radius.sm, paddingVertical: 14, paddingHorizontal: spacing.lg, backgroundColor: colors.surface },
+  optionChip: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: colors.border, borderRadius: radius.xl, paddingVertical: 14, paddingHorizontal: spacing.lg, backgroundColor: colors.surface },
   optionChipActive: { borderColor: colors.primary, backgroundColor: colors.primaryMuted },
   checkbox: { width: 20, height: 20, borderRadius: 6, borderWidth: 1, borderColor: colors.border, marginRight: spacing.md, justifyContent: 'center', alignItems: 'center' },
   checkboxActive: { backgroundColor: colors.primary, borderColor: colors.primary },
   optionLabel: { ...typography.bodyMedium, color: colors.text, flex: 1 },
   optionLabelActive: { color: colors.primary, fontWeight: '600' },
-  continueBtn: { backgroundColor: colors.primary, borderRadius: radius.sm, paddingVertical: 14, alignItems: 'center', marginTop: spacing.lg },
+  continueBtn: { backgroundColor: colors.primary, borderRadius: radius.lg, paddingVertical: 14, alignItems: 'center', marginTop: spacing.lg },
   continueBtnText: { ...typography.cardTitle, color: '#FFF' },
-  textInput: { borderWidth: 1, borderColor: colors.border, borderRadius: radius.sm, padding: spacing.md, ...typography.body, color: colors.text, minHeight: 70, textAlignVertical: 'top', backgroundColor: colors.background, marginBottom: spacing.xs },
+  textInput: { borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, padding: spacing.md, ...typography.body, color: colors.text, minHeight: 70, textAlignVertical: 'top', backgroundColor: colors.surfaceElevated, marginBottom: spacing.xs },
 
   // Summary
   summaryWrap: { marginHorizontal: spacing.lg, marginBottom: spacing.md, gap: spacing.lg },
-  sevCard: { backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.lg, borderWidth: 1, borderColor: colors.border },
+  sevCard: { backgroundColor: colors.surface, borderRadius: radius.xl, padding: spacing.lg, borderWidth: 1, borderColor: colors.border, ...shadows.sm },
   sevHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.sm },
   sevScore: { ...typography.screenTitle, color: colors.text },
   sevReason: { ...typography.body, color: colors.textSecondary },
-  hypoCard: { flexDirection: 'row', alignItems: 'flex-start', backgroundColor: colors.primaryMuted, borderRadius: radius.md, padding: spacing.lg },
+  hypoCard: { flexDirection: 'row', alignItems: 'flex-start', backgroundColor: colors.primaryMuted, borderRadius: radius.xl, padding: spacing.lg },
   hypoLabel: { ...typography.meta, color: colors.textSecondary },
   hypoText: { ...typography.cardTitle, color: colors.text, marginTop: spacing.xs },
   narrative: { ...typography.body, color: colors.textSecondary, lineHeight: 22, paddingHorizontal: spacing.xs },
-  secCard: { backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.lg, borderWidth: 1, borderColor: colors.border },
+  secCard: { backgroundColor: colors.surface, borderRadius: radius.xl, padding: spacing.lg, borderWidth: 1, borderColor: colors.border, ...shadows.sm },
   secHeading: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.md },
   secTitle: { ...typography.cardTitle, color: colors.text },
   secBody: { ...typography.body, color: colors.textSecondary, marginTop: spacing.sm },
-  tellDoc: { marginTop: spacing.md, backgroundColor: colors.background, borderRadius: radius.sm, padding: spacing.md },
+  tellDoc: { marginTop: spacing.md, backgroundColor: colors.surfaceElevated, borderRadius: radius.sm, padding: spacing.md },
   tellDocLabel: { ...typography.meta, color: colors.textSecondary, marginBottom: spacing.sm },
   tellDocItem: { ...typography.body, color: colors.text, lineHeight: 20 },
   stepRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: spacing.sm, gap: spacing.sm },
   stepNum: { width: 24, height: 24, borderRadius: 12, backgroundColor: colors.primaryMuted, justifyContent: 'center', alignItems: 'center' },
   stepNumText: { ...typography.meta, color: colors.primary, fontWeight: '700' },
   stepText: { flex: 1, ...typography.body, color: colors.text },
-  medCard: { backgroundColor: colors.background, borderRadius: radius.sm, padding: spacing.md, marginBottom: spacing.sm, borderWidth: 1, borderColor: colors.border },
+  medCard: { backgroundColor: colors.surfaceElevated, borderRadius: radius.sm, padding: spacing.md, marginBottom: spacing.sm, borderWidth: 1, borderColor: colors.border },
   medName: { ...typography.cardTitle, color: colors.text },
   medUse: { ...typography.caption, color: colors.textSecondary, marginTop: spacing.xs },
   habitRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.sm },
@@ -255,6 +255,6 @@ const s = StyleSheet.create({
   apItem: { marginBottom: spacing.md },
   apTitle: { ...typography.cardTitle, color: colors.text, marginTop: spacing.xs },
   apDetail: { ...typography.caption, color: colors.textSecondary, marginTop: spacing.xs },
-  disclaimerCard: { flexDirection: 'row', alignItems: 'flex-start', backgroundColor: colors.background, borderRadius: radius.sm, padding: spacing.md, gap: spacing.sm, borderWidth: 1, borderColor: colors.border },
+  disclaimerCard: { flexDirection: 'row', alignItems: 'flex-start', backgroundColor: colors.surfaceElevated, borderRadius: radius.sm, padding: spacing.md, gap: spacing.sm, borderWidth: 1, borderColor: colors.borderLight },
   disclaimerText: { flex: 1, ...typography.meta, color: colors.textTertiary, lineHeight: 17 },
 });

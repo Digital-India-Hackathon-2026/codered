@@ -1,141 +1,182 @@
-// LifeLens Design System — Monochrome base + functional color accents
-// Blue = primary action. Red = danger/high-severity. Yellow = caution. No decoration.
+// LifeLens Design System — Medical Precision: Sharp, Structured, Apple Health / Linear grade
+// Typography: DM Serif Display (headings/numbers) + Inter (body/UI)
 
-// ─── SPACING (fixed scale, nothing else) ───
+export const colors = {
+  // Backgrounds
+  background: '#F8F9FA',
+  surface: '#FFFFFF',
+  surfaceSunken: '#F1F3F5',
+
+  // Text
+  text: '#111827',
+  textSecondary: '#4B5563',
+  textTertiary: '#9CA3AF',
+  textInverse: '#FFFFFF',
+
+  // Border
+  border: '#E5E7EB',
+
+  // Coral (primary accent)
+  coral: '#EF4444',
+  coralSoft: '#FEE2E2',
+
+  // Amber
+  amber: '#F59E0B',
+
+  // Sage (success/health)
+  sage: '#10B981',
+
+  // Danger
+  danger: '#DC2626',
+
+  // Severity
+  severity: {
+    low: '#10B981',
+    moderate: '#F59E0B',
+    high: '#EF4444',
+    critical: '#DC2626',
+  },
+
+  // Gradients
+  gradient: {
+    orb: ['#EF4444', '#F59E0B', '#10B981'] as [string, string, string],
+    orbGlow: ['rgba(239,68,68,0.25)', 'rgba(239,68,68,0)'] as [string, string],
+    coralAmber: ['#EF4444', '#F59E0B'] as [string, string],
+    fadeBottom: ['transparent', '#F8F9FA'] as [string, string],
+    hero: ['#EF4444', '#F59E0B'] as [string, string],
+    primary: ['#EF4444', '#DC2626'] as [string, string],
+  },
+
+  // Misc
+  shadow: '#000000',
+  white: '#FFFFFF',
+  transparent: 'transparent',
+
+  // Legacy aliases
+  primary: '#EF4444',
+  primaryMuted: '#FEE2E2',
+  success: '#10B981',
+  successMuted: '#D1FAE5',
+  warning: '#F59E0B',
+  warningMuted: '#FEF3C7',
+  dangerMuted: '#FEE2E2',
+  surfaceElevated: '#FFFFFF',
+  surfaceSecondary: '#F1F3F5',
+  borderLight: '#E5E7EB',
+} as const;
+
 export const spacing = {
   xs: 4,
   sm: 8,
   md: 12,
   lg: 16,
-  xl: 24,
-  '2xl': 32,
-  '3xl': 48,
-  '4xl': 64,
+  xl: 20,
+  '2xl': 24,
+  '3xl': 32,
+  '4xl': 48,
+} as const;
 
-  // Legacy aliases
-  xxl: 24,
-  xxxl: 32,
-};
-
-// ─── RADIUS (two values only) ───
 export const radius = {
-  sm: 8,   // inputs, chips, small elements
-  md: 12,  // cards, containers
-  // Legacy
-  chip: 8,
-  button: 8,
-  card: 12,
-};
-
-// Legacy alias
-export const borderRadius = {
-  sm: 8,
-  md: 12,
+  sm: 4,
+  md: 8,
   lg: 12,
-  xl: 12,
+  xl: 16,
+  '2xl': 20,
   full: 999,
-};
+} as const;
 
-// ─── SHADOWS (minimal, near-imperceptible) ───
+export const borderRadius = radius;
+
 export const shadows = {
+  card: {
+    shadowColor: '#000000',
+    shadowOpacity: 0.04,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
   sm: {
     shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.03,
-    shadowRadius: 3,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 1 },
     elevation: 1,
   },
   md: {
     shadowColor: '#000000',
+    shadowOpacity: 0.04,
+    shadowRadius: 12,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
     elevation: 2,
   },
   lg: {
     shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.06,
     shadowRadius: 16,
+    shadowOffset: { width: 0, height: 4 },
     elevation: 4,
   },
-};
-
-// ─── COLORS ───
-export const colors = {
-  // Surfaces
-  background: '#FAFAFA',
-  surface: '#FFFFFF',
-  surfaceElevated: '#FFFFFF',
-
-  // Primary — blue, for actions only
-  primary: '#1D4ED8',
-  primaryMuted: '#EFF6FF',
-  primaryLight: '#EFF6FF',
-  primaryDark: '#1E40AF',
-
-  // Semantic — each has ONE job
-  danger: '#DC2626',
-  dangerMuted: '#FEF2F2',
-  warning: '#D97706',
-  warningMuted: '#FFFBEB',
-  success: '#15803D',
-  successMuted: '#F0FDF4',
-
-  // Text
-  text: '#0A0A0B',
-  textSecondary: '#6B6B70',
-  textTertiary: '#A0A0A5',
-
-  // Borders
-  border: '#E4E4E7',
-  borderLight: '#E4E4E7',
-
-  // Legacy aliases (mapped to new system)
-  accent: '#1D4ED8',
-  accentMuted: '#EFF6FF',
-  secondary: '#15803D',
-
-  // Severity
-  severity: {
-    low: '#15803D',
-    moderate: '#D97706',
-    high: '#DC2626',
-    critical: '#DC2626',
+  header: {
+    shadowColor: '#000000',
+    shadowOpacity: 0.03,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
   },
-
-  // Gradients (removed — only keep for backward compat, use sparingly)
-  gradient: {
-    primary: ['#1D4ED8', '#1E40AF'] as [string, string],
-    hero: ['#1D4ED8', '#1E40AF'] as [string, string],
-    soft: ['#FAFAFA', '#F5F5F6'] as [string, string],
-    warm: ['#FAFAFA', '#FAFAFA'] as [string, string],
-    health: ['#15803D', '#15803D'] as [string, string],
-    purple: ['#1D4ED8', '#1D4ED8'] as [string, string],
+  tabBar: {
+    shadowColor: '#000000',
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: -2 },
+    elevation: 6,
   },
+} as const;
 
-  shadow: '#000000',
-};
+export const fonts = {
+  fraunces: {
+    regular: 'Geist-Regular',
+    medium: 'Geist-Medium',
+    semiBold: 'Geist-SemiBold',
+    bold: 'Geist-Bold',
+  },
+  generalSans: {
+    regular: 'Geist-Regular',
+    medium: 'Geist-Medium',
+    semiBold: 'Geist-SemiBold',
+    bold: 'Geist-Bold',
+  },
+} as const;
 
-// ─── TYPOGRAPHY ───
 export const typography = {
-  // Design system scale
-  display: { fontSize: 48, fontWeight: '700' as const, lineHeight: 52 },
-  screenTitle: { fontSize: 24, fontWeight: '600' as const, lineHeight: 30 },
-  sectionTitle: { fontSize: 18, fontWeight: '600' as const, lineHeight: 24 },
-  cardTitle: { fontSize: 15, fontWeight: '500' as const, lineHeight: 20 },
-  body: { fontSize: 14, fontWeight: '400' as const, lineHeight: 20 },
-  bodyMedium: { fontSize: 14, fontWeight: '500' as const, lineHeight: 20 },
-  caption: { fontSize: 13, fontWeight: '400' as const, lineHeight: 18 },
-  meta: { fontSize: 12, fontWeight: '400' as const, lineHeight: 16 },
-
+  // New tokens
+  displayHero: { fontFamily: fonts.fraunces.semiBold, fontSize: 28, letterSpacing: -0.3 },
+  h1: { fontFamily: fonts.fraunces.semiBold, fontSize: 28, lineHeight: 34 },
+  h2: { fontFamily: fonts.fraunces.semiBold, fontSize: 22, lineHeight: 28 },
+  h3: { fontFamily: fonts.fraunces.semiBold, fontSize: 18, lineHeight: 24 },
+  body: { fontFamily: fonts.generalSans.regular, fontSize: 14, lineHeight: 20 },
+  bodyMedium: { fontFamily: fonts.generalSans.medium, fontSize: 14, lineHeight: 20 },
+  label: { fontFamily: fonts.generalSans.medium, fontSize: 14, lineHeight: 20 },
+  caption: { fontFamily: fonts.generalSans.regular, fontSize: 13, lineHeight: 18 },
+  captionMedium: { fontFamily: fonts.generalSans.medium, fontSize: 13, lineHeight: 18 },
+  eyebrow: { fontFamily: fonts.generalSans.semiBold, fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase' as const },
+  tiny: { fontFamily: fonts.generalSans.regular, fontSize: 11, lineHeight: 14 },
+  tinyMedium: { fontFamily: fonts.generalSans.medium, fontSize: 11, lineHeight: 14 },
   // Legacy aliases
-  h1: { fontSize: 24, fontWeight: '600' as const, lineHeight: 30 },
-  h2: { fontSize: 20, fontWeight: '600' as const, lineHeight: 26 },
-  h3: { fontSize: 18, fontWeight: '600' as const, lineHeight: 24 },
-  bodyBold: { fontSize: 15, fontWeight: '500' as const, lineHeight: 20 },
-  small: { fontSize: 12, fontWeight: '400' as const, lineHeight: 16 },
-};
+  screenTitle: { fontFamily: fonts.fraunces.semiBold, fontSize: 28, lineHeight: 34 },
+  sectionTitle: { fontFamily: fonts.generalSans.semiBold, fontSize: 16, lineHeight: 22 },
+  cardTitle: { fontFamily: fonts.generalSans.semiBold, fontSize: 15, lineHeight: 22 },
+  meta: { fontFamily: fonts.generalSans.medium, fontSize: 12, lineHeight: 16 },
+} as const;
 
-const theme = { spacing, radius, borderRadius, shadows, colors, typography };
+export const motion = {
+  stagger: 60,
+  enterDuration: 220,
+  enterTranslateY: 8,
+  orbBreathDuration: 2400,
+  orbPulseDuration: 1600,
+  pressScale: 0.98,
+} as const;
+
+const theme = { colors, spacing, radius, shadows, fonts, typography, motion };
+export type Theme = typeof theme;
 export default theme;

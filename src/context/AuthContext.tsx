@@ -45,8 +45,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1OTE4IiwiZW1haWwiOiJ2YXJ1bnRlanJlZGR5MDNAZ21haWwuY29tIiwidXNlcm5hbWUiOiJXaXNlRmVhdGhlcjE3OSIsImZ1bGxfbmFtZSI6bnVsbCwiYWNjb3VudF90eXBlIjoidXNlciIsImV4cCI6MTgxNTAxODM2NX0.SMVz_RqI1cspTRXLP-N5JWrW0h8ofRyXSrEPdKtat1c';
         await AsyncStorage.setItem('accessToken', token);
       }
-      const { data } = await authAPI.getMe();
-      setUser({ id: data.id?.toString(), name: data.username || '', username: data.username, email: data.email, image_src: data.image_src, interests: data.interests, gender: data.gender, date_of_birth: data.date_of_birth });
+      // Race: API call vs 1.5s timeout (so splash never hangs)
+      const result = await Promise.race([
+        authAPI.getMe().then(r => r.data),
+        new Promise(resolve => setTimeout(() => resolve(null), 1500)),
+      ]) as any;
+      if (result?.id) {
+        setUser({ id: result.id?.toString(), name: result.username || '', username: result.username, email: result.email, image_src: result.image_src, interests: result.interests, gender: result.gender, date_of_birth: result.date_of_birth });
+      } else {
+        setUser({ id: '5918', name: 'WiseFeather179', email: 'varuntejreddy03@gmail.com' });
+      }
     } catch {
       setUser({ id: '5918', name: 'WiseFeather179', email: 'varuntejreddy03@gmail.com' });
     } finally {

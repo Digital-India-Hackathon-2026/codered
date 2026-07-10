@@ -1,130 +1,179 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, Pressable, Linking } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Icon } from '../../components/shared/Icon';
+import { StaggeredListItem } from '../../components/shared';
 import { useAuth } from '../../context/AuthContext';
-import { Card, Button } from '../../components/UI';
-import { Icon } from '../../components/shared';
-import { healthProfileAPI, dataAPI } from '../../api/services';
-import { colors, spacing, typography, radius } from '../../theme';
+import { colors, radius, fonts } from '../../theme';
 
 export const ProfileScreen = ({ navigation }: any) => {
   const { user, logout } = useAuth();
-  const [profile, setProfile] = useState<any>(null);
 
-  useEffect(() => {
-    healthProfileAPI.get().then(({ data }) => setProfile(data)).catch(() => {});
-  }, []);
-
-  const handleExport = async () => {
-    try { await dataAPI.export(); Alert.alert('Export Started', 'Your data export will be emailed.'); }
-    catch { Alert.alert('Error', 'Could not export data'); }
+  const handleSignOut = async () => {
+    await AsyncStorage.removeItem('accessToken');
+    await AsyncStorage.removeItem('userId');
+    logout();
   };
 
-  const handleDeleteAccount = () => {
-    Alert.alert('Delete Account', 'This will permanently delete all your data.', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: async () => {
-        try { await dataAPI.deleteAll(); await logout(); } catch {}
-      }},
-    ]);
-  };
-
-  const menuItems = [
-    { icon: 'user', label: 'Edit Profile' },
-    { icon: 'heart', label: 'Health Profile' },
-    { icon: 'users', label: 'Family History' },
-    { icon: 'sun', label: 'Lifestyle' },
-    { icon: 'alert-circle', label: 'Allergies' },
-    { icon: 'share-2', label: 'Share Health Summary' },
-    { icon: 'download', label: 'Export My Data', onPress: handleExport },
-    { icon: 'bell', label: 'Notifications' },
-    { icon: 'lock', label: 'Privacy & Consent' },
-  ];
+  const initials = (user?.name || 'U').slice(0, 2).toUpperCase();
 
   return (
-    <ScrollView style={s.container} contentContainerStyle={s.content}>
-      {/* Profile Header */}
-      <View style={s.profileCard}>
-        <View style={s.avatarLarge}>
-          <Text style={s.avatarText}>{user?.name?.[0] || user?.username?.[0] || 'U'}</Text>
-        </View>
-        <Text style={s.userName}>{user?.name || user?.username}</Text>
-        <Text style={s.userEmail}>{user?.email || user?.phone}</Text>
-        {profile && (
-          <View style={s.statsRow}>
-            <View style={s.stat}>
-              <Text style={s.statValue}>{profile.age || '—'}</Text>
-              <Text style={s.statLabel}>Age</Text>
+    <SafeAreaView style={s.root} edges={['top']}>
+      <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <StaggeredListItem index={0}>
+          <Text style={s.h1}>Profile</Text>
+        </StaggeredListItem>
+
+        {/* User Card */}
+        <StaggeredListItem index={1}>
+          <View style={s.userCard}>
+            <View style={s.avatarCircle}>
+              <Text style={s.avatarText}>{initials}</Text>
             </View>
-            <View style={s.statDivider} />
-            <View style={s.stat}>
-              <Text style={s.statValue}>{profile.blood_group || '—'}</Text>
-              <Text style={s.statLabel}>Blood</Text>
-            </View>
-            <View style={s.statDivider} />
-            <View style={s.stat}>
-              <Text style={s.statValue}>{profile.conditions?.length || 0}</Text>
-              <Text style={s.statLabel}>Conditions</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={s.userName}>{user?.name || user?.username || 'User'}</Text>
+              <Text style={s.userEmail}>{user?.email || user?.phone || ''}</Text>
             </View>
           </View>
-        )}
-      </View>
+        </StaggeredListItem>
 
-      {/* Menu */}
-      <View style={s.menuCard}>
-        {menuItems.map((item, i) => (
-          <Pressable
-            key={i}
-            style={[s.menuItem, i < menuItems.length - 1 && s.menuItemBorder]}
-            onPress={item.onPress}
-          >
-            <Icon name={item.icon} size={18} color={colors.textSecondary} />
-            <Text style={s.menuLabel}>{item.label}</Text>
-            <Icon name="chevron-right" size={16} color={colors.textTertiary} />
+        {/* Quick Actions */}
+        <StaggeredListItem index={2}>
+          <Text style={s.sectionTitle}>Health</Text>
+          <MenuItem
+            icon="Pill"
+            iconColor={colors.amber}
+            tint="#FEF3C7"
+            label="Medications"
+            subtitle="Coming soon"
+          />
+          <MenuItem
+            icon="FileText"
+            iconColor={colors.coral}
+            tint={colors.coralSoft}
+            label="Reports"
+            subtitle="Coming soon"
+          />
+          <MenuItem
+            icon="Heartbeat"
+            iconColor={colors.sage}
+            tint="#D1FAE5"
+            label="Health Connect"
+            subtitle="Manage connected data sources"
+            onPress={() => Linking.openURL('content://com.google.android.apps.healthdata').catch(() => {})}
+          />
+        </StaggeredListItem>
+
+        {/* App */}
+        <StaggeredListItem index={3}>
+          <Text style={s.sectionTitle}>App</Text>
+          <MenuItem
+            icon="ChatCircle"
+            iconColor="#3B82F6"
+            tint="#EEF4FF"
+            label="Chat History"
+            onPress={() => navigation.navigate('ChatHistory')}
+          />
+          <MenuItem
+            icon="Info"
+            iconColor={colors.textSecondary}
+            tint={colors.surfaceSunken}
+            label="About LifeLens"
+            subtitle="v1.0.0 · CodeRed Hackathon 2026"
+          />
+        </StaggeredListItem>
+
+        {/* Sign Out */}
+        <StaggeredListItem index={4}>
+          <Pressable style={s.signOutBtn} onPress={handleSignOut}>
+            <Icon name="SignOut" size={18} color={colors.coral} weight="regular" />
+            <Text style={s.signOutText}>Sign out</Text>
           </Pressable>
-        ))}
-      </View>
+        </StaggeredListItem>
 
-      {/* Actions */}
-      <View style={s.dangerSection}>
-        <Button title="Logout" variant="outline" onPress={logout} style={{ marginBottom: spacing.sm }} />
-        <Pressable style={s.deleteBtn} onPress={handleDeleteAccount}>
-          <Text style={s.deleteText}>Delete account</Text>
-        </Pressable>
-      </View>
-    </ScrollView>
+        <View style={{ height: 100 }} />
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
+const MenuItem = ({ icon, iconColor, tint, label, subtitle, onPress }: {
+  icon: string; iconColor: string; tint: string; label: string; subtitle?: string; onPress?: () => void;
+}) => (
+  <Pressable style={s.menuCard} onPress={onPress}>
+    <View style={[s.iconBox, { backgroundColor: tint }]}>
+      <Icon name={icon} size={17} color={iconColor} weight="fill" />
+    </View>
+    <View style={{ flex: 1 }}>
+      <Text style={s.menuLabel}>{label}</Text>
+      {subtitle && <Text style={s.menuSub}>{subtitle}</Text>}
+    </View>
+    {onPress && <Icon name="CaretRight" size={14} color={colors.textTertiary} weight="regular" />}
+  </Pressable>
+);
+
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.lg, paddingTop: spacing['2xl'], paddingBottom: 100 },
+  root: { flex: 1, backgroundColor: colors.background },
+  content: { paddingHorizontal: 24, paddingTop: 12 },
 
-  profileCard: {
-    backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.xl,
-    alignItems: 'center', borderWidth: 1, borderColor: colors.border, marginBottom: spacing.lg,
-  },
-  avatarLarge: {
-    width: 64, height: 64, borderRadius: 32, backgroundColor: '#F4F4F5',
-    justifyContent: 'center', alignItems: 'center', marginBottom: spacing.md,
-  },
-  avatarText: { fontSize: 24, fontWeight: '600', color: colors.textSecondary },
-  userName: { ...typography.sectionTitle, color: colors.text },
-  userEmail: { ...typography.caption, color: colors.textSecondary, marginTop: 2 },
-  statsRow: { flexDirection: 'row', marginTop: spacing.xl, gap: spacing.xl },
-  stat: { alignItems: 'center' },
-  statValue: { ...typography.cardTitle, color: colors.text, fontWeight: '600' },
-  statLabel: { ...typography.meta, color: colors.textTertiary },
-  statDivider: { width: 1, height: 24, backgroundColor: colors.border },
+  h1: { fontFamily: fonts.fraunces.semiBold, fontSize: 28, lineHeight: 34, color: colors.text, marginBottom: 20 },
 
+  // User card
+  userCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: 16,
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: colors.border,
+    gap: 14,
+  },
+  avatarCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.text,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarText: { fontFamily: fonts.generalSans.semiBold, fontSize: 16, color: colors.textInverse },
+  userName: { fontFamily: fonts.generalSans.semiBold, fontSize: 16, color: colors.text },
+  userEmail: { fontFamily: fonts.generalSans.regular, fontSize: 13, color: colors.textTertiary, marginTop: 2 },
+
+  // Section
+  sectionTitle: { fontFamily: fonts.generalSans.semiBold, fontSize: 12, letterSpacing: 0.5, color: colors.textTertiary, textTransform: 'uppercase', marginBottom: 8, marginTop: 4 },
+
+  // Menu
   menuCard: {
-    backgroundColor: colors.surface, borderRadius: radius.md,
-    borderWidth: 1, borderColor: colors.border, marginBottom: spacing.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    padding: 13,
+    marginBottom: 6,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
-  menuItem: { flexDirection: 'row', alignItems: 'center', padding: spacing.lg, gap: spacing.md },
-  menuItemBorder: { borderBottomWidth: 1, borderBottomColor: colors.border },
-  menuLabel: { ...typography.body, color: colors.text, flex: 1 },
+  iconBox: { width: 34, height: 34, borderRadius: radius.sm, justifyContent: 'center', alignItems: 'center', marginRight: 12 },
+  menuLabel: { fontFamily: fonts.generalSans.medium, fontSize: 14, color: colors.text },
+  menuSub: { fontFamily: fonts.generalSans.regular, fontSize: 11, color: colors.textTertiary, marginTop: 1 },
 
-  dangerSection: { marginTop: spacing.sm },
-  deleteBtn: { alignItems: 'center', paddingVertical: spacing.md },
-  deleteText: { ...typography.caption, color: colors.danger },
+  // Sign out
+  signOutBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radius.md,
+    height: 46,
+    gap: 8,
+    marginTop: 20,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+  },
+  signOutText: { fontFamily: fonts.generalSans.medium, fontSize: 14, color: colors.coral },
 });

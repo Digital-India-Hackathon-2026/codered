@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Icon } from '../../components/shared';
-import { colors, spacing, radius, typography } from '../../theme';
+import { Icon } from '../../components/shared/Icon';
+import { colors, radius, fonts } from '../../theme';
 
 const AI_BASE = 'https://askfirst.co/api/ai';
 
@@ -23,10 +25,7 @@ export const ChatHistoryScreen = ({ navigation }: any) => {
     try {
       const token = await AsyncStorage.getItem('accessToken');
       const res = await fetch(`${AI_BASE}/threads?user_id=5918`, {
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Cookie: `session_token=${token}` } : {}),
-        },
+        headers: { 'Content-Type': 'application/json', ...(token ? { Cookie: `session_token=${token}` } : {}) },
       });
       const data: any = await res.json();
       setThreads((data.threads || []).filter((t: Thread) => t.user_message));
@@ -35,42 +34,51 @@ export const ChatHistoryScreen = ({ navigation }: any) => {
 
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
-    const now = new Date();
-    const diff = Math.floor((now.getTime() - d.getTime()) / 86400000);
+    const diff = Math.floor((Date.now() - d.getTime()) / 86400000);
     if (diff === 0) return 'Today';
     if (diff === 1) return 'Yesterday';
     if (diff < 7) return `${diff}d ago`;
-    return d.toLocaleDateString();
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
-  const renderThread = ({ item }: { item: Thread }) => (
-    <Pressable
-      style={s.item}
-      onPress={() => navigation.navigate('ChatThread', { threadId: item.id })}
-    >
-      <View style={s.itemIcon}>
-        <Icon name="message-circle" size={16} color={colors.textSecondary} />
-      </View>
-      <View style={{ flex: 1 }}>
-        <Text style={s.itemMsg} numberOfLines={2}>{item.user_message}</Text>
-        <Text style={s.itemDate}>{formatDate(item.created_at)}</Text>
-      </View>
-      <Icon name="chevron-right" size={16} color={colors.textTertiary} />
-    </Pressable>
+  const renderThread = ({ item, index }: { item: Thread; index: number }) => (
+    <Animated.View entering={FadeInDown.delay(index * 50).duration(200).damping(18)}>
+      <Pressable
+        style={s.card}
+        onPress={() => navigation.navigate('ChatThread', { threadId: item.id })}
+      >
+        <View style={s.iconWrap}>
+          <Icon name="ChatCircle" size={18} color={colors.coral} weight="fill" />
+        </View>
+        <View style={s.cardBody}>
+          <Text style={s.userMsg} numberOfLines={2}>{item.user_message}</Text>
+          {item.assistant_message && (
+            <Text style={s.assistantMsg} numberOfLines={1}>{item.assistant_message}</Text>
+          )}
+        </View>
+        <View style={s.cardRight}>
+          <Text style={s.date}>{formatDate(item.created_at)}</Text>
+          <Icon name="CaretRight" size={14} color={colors.textTertiary} weight="regular" />
+        </View>
+      </Pressable>
+    </Animated.View>
   );
 
   return (
-    <View style={s.container}>
+    <SafeAreaView style={s.root} edges={['top']}>
       <View style={s.header}>
         <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
-          <Icon name="arrow-left" size={20} color={colors.text} />
+          <Icon name="ArrowLeft" size={22} color={colors.text} weight="regular" />
         </Pressable>
         <Text style={s.headerTitle}>Chat History</Text>
-        <View style={{ width: 20 }} />
+        <View style={{ width: 22 }} />
       </View>
+
       {threads.length === 0 && !loading ? (
         <View style={s.empty}>
-          <Text style={s.emptyText}>No conversations yet</Text>
+          <Icon name="ChatCircleDots" size={40} color={colors.textTertiary} weight="regular" />
+          <Text style={s.emptyTitle}>No conversations yet</Text>
+          <Text style={s.emptyDesc}>Start chatting with Clary to see your history here</Text>
         </View>
       ) : (
         <FlatList
@@ -81,31 +89,48 @@ export const ChatHistoryScreen = ({ navigation }: any) => {
           showsVerticalScrollIndicator={false}
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+  root: { flex: 1, backgroundColor: colors.background },
   header: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: spacing.lg, paddingVertical: spacing.md,
-    borderBottomWidth: 1, borderBottomColor: colors.border,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
     backgroundColor: colors.surface,
   },
-  headerTitle: { ...typography.cardTitle, color: colors.text, fontWeight: '600' },
-  list: { padding: spacing.lg },
-  item: {
-    flexDirection: 'row', alignItems: 'center', gap: spacing.md,
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1, borderBottomColor: colors.border,
+  headerTitle: { fontFamily: fonts.generalSans.semiBold, fontSize: 16, color: colors.text },
+  list: { padding: 16, gap: 8 },
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: colors.border,
+    gap: 12,
   },
-  itemIcon: {
-    width: 36, height: 36, borderRadius: 18,
-    backgroundColor: '#F4F4F5', justifyContent: 'center', alignItems: 'center',
+  iconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.coralSoft,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  itemMsg: { ...typography.body, color: colors.text },
-  itemDate: { ...typography.meta, color: colors.textTertiary, marginTop: 2 },
-  empty: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  emptyText: { ...typography.body, color: colors.textSecondary },
+  cardBody: { flex: 1 },
+  userMsg: { fontFamily: fonts.generalSans.medium, fontSize: 14, color: colors.text, lineHeight: 19 },
+  assistantMsg: { fontFamily: fonts.generalSans.regular, fontSize: 12, color: colors.textTertiary, marginTop: 3 },
+  cardRight: { alignItems: 'flex-end', gap: 6 },
+  date: { fontFamily: fonts.generalSans.regular, fontSize: 11, color: colors.textTertiary },
+  empty: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 8, paddingHorizontal: 40 },
+  emptyTitle: { fontFamily: fonts.generalSans.semiBold, fontSize: 16, color: colors.text },
+  emptyDesc: { fontFamily: fonts.generalSans.regular, fontSize: 13, color: colors.textTertiary, textAlign: 'center' },
 });

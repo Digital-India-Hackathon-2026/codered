@@ -1,265 +1,306 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  View, Text, StyleSheet, ScrollView, RefreshControl,
-  StatusBar, Alert, Linking, Pressable,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Dimensions, Pressable, RefreshControl, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import LinearGradient from 'react-native-linear-gradient';
+import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing } from 'react-native-reanimated';
+import { Icon } from '../../components/shared/Icon';
+import { StaggeredListItem } from '../../components/shared';
+import { colors, radius, fonts } from '../../theme';
 import { healthConnect, HealthData } from '../../services/healthConnect';
-import { colors, spacing, radius, typography } from '../../theme';
-import { Icon } from '../../components/shared';
 
-export const VitalsScreen = ({ navigation }: any) => {
-  const [connected, setConnected] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+const SCREEN_W = Dimensions.get('window').width;
+const METRIC_W = (SCREEN_W - 24 * 2 - 12) / 2;
+const BAR_MAX_H = 120;
+const DAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+export const VitalsScreen = () => {
+  const navigation = useNavigation<any>();
   const [data, setData] = useState<HealthData | null>(null);
-  const [stepsHistory, setStepsHistory] = useState<{ date: string; steps: number }[]>([]);
+  const [hrHistory, setHrHistory] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [hasPermission, setHasPermission] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const checkAndLoad = useCallback(async () => {
-    const availability = await healthConnect.checkAvailability();
-    if (availability === 'not_installed') {
-      Alert.alert(
-        'Health Connect Required',
-        'Please install or update Health Connect from Play Store.',
-        [{ text: 'Open Play Store', onPress: () => Linking.openURL('https://play.google.com/store/apps/details?id=com.google.android.apps.healthdata') },
-         { text: 'Cancel' }],
-      );
-      setLoading(false);
-      return;
-    }
-    if (availability === 'unavailable') { setLoading(false); return; }
-    const inited = await healthConnect.init();
-    if (!inited) { setLoading(false); return; }
-    const granted = await healthConnect.requestPermissions();
-    setConnected(granted);
-    if (granted) {
-      setData(await healthConnect.getHealthData());
-      setStepsHistory(await healthConnect.getStepsHistory(7));
-    }
-    setLoading(false);
+  const pulseScale = useSharedValue(1);
+
+  useEffect(() => {
+    pulseScale.value = withRepeat(
+      withSequence(
+        withTiming(1.02, { duration: 800, easing: Easing.inOut(Easing.ease) }),
+        withTiming(1, { duration: 800, easing: Easing.inOut(Easing.ease) }),
+      ), -1,
+    );
   }, []);
 
-  useEffect(() => { checkAndLoad(); }, [checkAndLoad]);
+  const pulseStyle = useAnimatedStyle(() => ({ transform: [{ scale: pulseScale.value }] }));
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    if (connected) {
-      setData(await healthConnect.getHealthData());
-      setStepsHistory(await healthConnect.getStepsHistory(7));
+  const loadData = useCallback(async () => {
+    try {
+      const available = await healthConnect.checkAvailability();
+      if (available !== 'available') {
+        setHasPermission(false);
+        setLoading(false);
+        return;
+      }
+
+      const inited = await healthConnect.init();
+      if (!inited) { setLoading(false); return; }
+
+      const hasPerm = await healthConnect.hasPermissions();
+      setHasPermission(hasPerm);
+
+      if (hasPerm) {
+        const healthData = await healthConnect.getHealthData();
+        setData(healthData);
+
+        // Get 7-day heart rate history
+        const stepsHistory = await healthConnect.getStepsHistory(7);
+        // Use steps as bar chart data (more commonly available than HR history)
+        setHrHistory(stepsHistory.map(d => d.steps));
+      }
+    } catch {} finally { setLoading(false); }
+  }, []);
+
+  useEffect(() => { loadData(); }, [loadData]);
+
+  const onRefresh = async () => { setRefreshing(true); await loadData(); setRefreshing(false); };
+
+  const requestPermissions = async () => {
+    const granted = await healthConnect.requestPermissions();
+    if (granted) {
+      setHasPermission(true);
+      loadData();
     }
-    setRefreshing(false);
   };
 
-  const formatTime = (t: string) => new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  const maxSteps = Math.max(...stepsHistory.map(d => d.steps), 1);
+  const shareWithClary = () => {
+    if (!data) return;
+    const summary = buildVitalsSummary(data);
+    navigation.navigate('ChatTab', { screen: 'ChatTab' });
+    // Small delay to let navigation complete, then we'll pass via params
+    setTimeout(() => {
+      navigation.navigate('Main', {
+        screen: 'ChatTab',
+        params: { prefill: `Here are my current vitals:\n${summary}\n\nPlease analyze and give me health insights.` },
+      });
+    }, 100);
+  };
 
-  if (loading) {
-    return (
-      <View style={s.center}>
-        <Icon name="watch" size={32} color={colors.textTertiary} />
-        <Text style={s.loadingText}>Connecting...</Text>
-      </View>
-    );
-  }
+  const buildVitalsSummary = (d: HealthData): string => {
+    const parts: string[] = [];
+    if (d.heartRate) parts.push(`Heart Rate: ${d.heartRate.bpm} bpm`);
+    if (d.steps > 0) parts.push(`Steps today: ${d.steps.toLocaleString()}`);
+    if (d.sleep) parts.push(`Sleep: ${d.sleep.hours}h ${d.sleep.minutes}m`);
+    if (d.spo2) parts.push(`SpO2: ${d.spo2}%`);
+    if (d.calories > 0) parts.push(`Calories burned: ${Math.round(d.calories)} kcal`);
+    if (d.distance > 0) parts.push(`Distance: ${(d.distance / 1000).toFixed(1)} km`);
+    if (d.bloodPressure) parts.push(`Blood Pressure: ${d.bloodPressure.systolic}/${d.bloodPressure.diastolic} mmHg`);
+    return parts.join('\n');
+  };
 
-  if (!connected) {
-    return (
-      <View style={s.center}>
-        <Icon name="watch" size={32} color={colors.textSecondary} />
-        <Text style={s.emptyTitle}>Connect Your Watch</Text>
-        <Text style={s.emptyDesc}>Sync via Google Health Connect to see live vitals.</Text>
-        <Pressable style={s.primaryBtn} onPress={checkAndLoad}>
-          <Text style={s.primaryBtnText}>Connect</Text>
-        </Pressable>
-        <Pressable style={s.secondaryBtn} onPress={() => healthConnect.openHealthConnectSettings()}>
-          <Text style={s.secondaryBtnText}>Open Settings</Text>
-        </Pressable>
-      </View>
-    );
-  }
+  // Build metrics from real data
+  const metrics = data ? [
+    { icon: 'PersonSimpleWalk' as const, label: 'STEPS', value: data.steps.toLocaleString(), of: '8,000', pct: Math.min(100, Math.round((data.steps / 8000) * 100)), color: colors.coral },
+    { icon: 'Moon' as const, label: 'SLEEP', value: data.sleep ? `${data.sleep.hours}:${data.sleep.minutes.toString().padStart(2, '0')}` : '--', of: '8h', pct: data.sleep ? Math.min(100, Math.round(((data.sleep.hours * 60 + data.sleep.minutes) / 480) * 100)) : 0, color: '#3B82F6' },
+    { icon: 'Fire' as const, label: 'CALORIES', value: data.calories > 0 ? Math.round(data.calories).toString() : '--', of: '500 kcal', pct: Math.min(100, Math.round((data.calories / 500) * 100)), color: colors.amber },
+    { icon: 'Drop' as const, label: 'SpO2', value: data.spo2 ? `${data.spo2}%` : '--', of: '95-100%', pct: data.spo2 ? Math.min(100, Math.round((data.spo2 / 100) * 100)) : 0, color: colors.sage },
+  ] : [];
+
+  const maxSteps = Math.max(...hrHistory, 1);
 
   return (
-    <View style={s.root}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+    <SafeAreaView style={s.root} edges={['top']}>
       <ScrollView
         contentContainerStyle={s.content}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.textTertiary} />}
         showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} />}
       >
-        {/* Header */}
-        <View style={s.header}>
-          <Text style={s.title}>Vitals</Text>
-          <View style={s.syncBadge}>
-            <View style={s.syncDot} />
-            <Text style={s.syncText}>Synced</Text>
-          </View>
-        </View>
+        <StaggeredListItem index={0}>
+          <Text style={s.eyebrow}>TODAY</Text>
+          <Text style={s.h1}>Vitals</Text>
+        </StaggeredListItem>
 
-        {/* Heart Rate */}
-        <View style={s.hrCard}>
-          <View style={s.hrTop}>
-            <Icon name="heart" size={16} color={colors.danger} />
-            <Text style={s.hrLabel}>Heart Rate</Text>
-            {data?.heartRate && <Text style={s.hrTime}>{formatTime(data.heartRate.time)}</Text>}
-          </View>
-          <View style={s.hrValueRow}>
-            <Text style={s.hrValue}>{data?.heartRate?.bpm || '--'}</Text>
-            <Text style={s.hrUnit}>bpm</Text>
-          </View>
-          {data?.heartRate && (
-            <Text style={[s.hrStatus, {
-              color: data.heartRate.bpm > 100 ? colors.danger : data.heartRate.bpm < 60 ? colors.warning : colors.success
-            }]}>
-              {data.heartRate.bpm > 100 ? 'High' : data.heartRate.bpm < 60 ? 'Low' : 'Normal'}
-            </Text>
-          )}
-        </View>
-
-        {/* Grid */}
-        <View style={s.grid}>
-          <View style={s.vitalCard}>
-            <Icon name="trending-up" size={16} color={colors.textSecondary} />
-            <Text style={s.vLabel}>Steps</Text>
-            <Text style={s.vValue}>{data?.steps?.toLocaleString() || '0'}</Text>
-            <View style={s.bar}><View style={[s.barFill, { width: `${Math.min((data?.steps || 0) / 10000 * 100, 100)}%` }]} /></View>
-          </View>
-          <View style={s.vitalCard}>
-            <Icon name="moon" size={16} color={colors.textSecondary} />
-            <Text style={s.vLabel}>Sleep</Text>
-            <Text style={s.vValue}>{data?.sleep ? `${data.sleep.hours}h ${data.sleep.minutes}m` : '--'}</Text>
-            <View style={s.bar}><View style={[s.barFill, { width: `${Math.min(((data?.sleep?.hours || 0) * 60 + (data?.sleep?.minutes || 0)) / 480 * 100, 100)}%` }]} /></View>
-          </View>
-          <View style={s.vitalCard}>
-            <Icon name="wind" size={16} color={colors.textSecondary} />
-            <Text style={s.vLabel}>SpO2</Text>
-            <Text style={s.vValue}>{data?.spo2 ? `${data.spo2}%` : '--'}</Text>
-            {data?.spo2 && <Text style={[s.vStatus, { color: data.spo2 >= 95 ? colors.success : colors.warning }]}>{data.spo2 >= 95 ? 'Normal' : 'Low'}</Text>}
-          </View>
-          <View style={s.vitalCard}>
-            <Icon name="zap" size={16} color={colors.textSecondary} />
-            <Text style={s.vLabel}>Calories</Text>
-            <Text style={s.vValue}>{Math.round(data?.calories || 0)}</Text>
-            <Text style={s.vMeta}>kcal</Text>
-          </View>
-          <View style={s.vitalCard}>
-            <Icon name="map-pin" size={16} color={colors.textSecondary} />
-            <Text style={s.vLabel}>Distance</Text>
-            <Text style={s.vValue}>{((data?.distance || 0) / 1000).toFixed(1)} km</Text>
-          </View>
-          <View style={s.vitalCard}>
-            <Icon name="activity" size={16} color={colors.textSecondary} />
-            <Text style={s.vLabel}>Blood Pressure</Text>
-            <Text style={s.vValue}>{data?.bloodPressure ? `${data.bloodPressure.systolic}/${data.bloodPressure.diastolic}` : '--'}</Text>
-            <Text style={s.vMeta}>mmHg</Text>
-          </View>
-        </View>
-
-        {/* Steps Chart */}
-        {stepsHistory.length > 0 && (
-          <>
-            <Text style={s.sectionTitle}>Steps — 7 days</Text>
-            <View style={s.chartCard}>
-              <View style={s.chartBars}>
-                {stepsHistory.map((day, i) => {
-                  const pct = (day.steps / maxSteps) * 100;
-                  const isToday = i === stepsHistory.length - 1;
-                  return (
-                    <View key={day.date} style={s.chartCol}>
-                      <Text style={s.chartVal}>{day.steps > 0 ? (day.steps / 1000).toFixed(1) + 'k' : '0'}</Text>
-                      <View style={s.chartBarBg}>
-                        <View style={[s.chartBarFill, { height: `${pct}%`, backgroundColor: isToday ? colors.primary : '#D4D4D8' }]} />
-                      </View>
-                      <Text style={[s.chartDay, isToday && { color: colors.primary, fontWeight: '600' }]}>
-                        {new Date(day.date).toLocaleDateString([], { weekday: 'short' }).slice(0, 2)}
-                      </Text>
-                    </View>
-                  );
-                })}
-              </View>
+        {/* Permission Request */}
+        {!hasPermission && !loading && (
+          <StaggeredListItem index={1}>
+            <View style={s.permCard}>
+              <Icon name="HeartHalf" size={32} color={colors.coral} weight="fill" />
+              <Text style={s.permTitle}>Connect Health Data</Text>
+              <Text style={s.permDesc}>Allow LifeLens to read your health data from Health Connect for real-time vitals.</Text>
+              <Pressable style={s.permBtn} onPress={requestPermissions}>
+                <Text style={s.permBtnText}>Grant Access</Text>
+              </Pressable>
             </View>
-          </>
+          </StaggeredListItem>
         )}
 
-        {/* Ask Clary */}
-        <Pressable
-          style={s.claryCard}
-          onPress={() => {
-            const summary = `My vitals: HR ${data?.heartRate?.bpm || 'N/A'} bpm, Steps ${data?.steps || 0}, Sleep ${data?.sleep ? `${data.sleep.hours}h ${data.sleep.minutes}m` : 'N/A'}, SpO2 ${data?.spo2 || 'N/A'}%`;
-            navigation.navigate('ChatTab', { prefill: summary });
-          }}
-        >
-          <Icon name="message-circle" size={18} color={colors.primary} />
-          <View style={{ flex: 1 }}>
-            <Text style={s.claryTitle}>Ask Clary about your vitals</Text>
-          </View>
-          <Icon name="arrow-right" size={16} color={colors.textTertiary} />
-        </Pressable>
+        {/* Heart Rate Hero */}
+        {hasPermission && (
+          <StaggeredListItem index={1}>
+            <View style={s.heroCard}>
+              <View style={s.heroTop}>
+                <View style={s.heroLabel}>
+                  <Icon name="Heartbeat" size={18} color={colors.coral} weight="fill" />
+                  <Text style={s.heroLabelText}>Heart rate</Text>
+                </View>
+                {data?.heartRate && (
+                  <View style={s.restingPill}>
+                    <Text style={s.restingText}>LATEST</Text>
+                  </View>
+                )}
+              </View>
 
-        <View style={{ height: spacing['2xl'] }} />
+              <View style={s.heroValueRow}>
+                {data?.heartRate ? (
+                  <>
+                    <Animated.View style={pulseStyle}>
+                      <Text style={s.heroValue}>{data.heartRate.bpm}</Text>
+                    </Animated.View>
+                    <Text style={s.heroUnit}>bpm</Text>
+                  </>
+                ) : (
+                  <Text style={s.noData}>No heart rate data</Text>
+                )}
+              </View>
+
+              {/* Steps bar chart (7 days) */}
+              {hrHistory.length > 0 && (
+                <View style={s.barsContainer}>
+                  {hrHistory.map((v, i) => {
+                    const h = Math.max(8, Math.round((v / maxSteps) * BAR_MAX_H));
+                    const isToday = i === hrHistory.length - 1;
+                    return (
+                      <View key={i} style={s.barCol}>
+                        <View style={s.barTrack}>
+                          {isToday ? (
+                            <LinearGradient
+                              colors={colors.gradient.coralAmber}
+                              start={{ x: 0, y: 0 }}
+                              end={{ x: 0, y: 1 }}
+                              style={[s.barFill, { height: h }]}
+                            />
+                          ) : (
+                            <View style={[s.barFill, s.barInactive, { height: h }]} />
+                          )}
+                        </View>
+                        <Text style={[s.dayLabel, isToday && s.dayLabelActive]}>{DAYS[i]}</Text>
+                      </View>
+                    );
+                  })}
+                </View>
+              )}
+            </View>
+          </StaggeredListItem>
+        )}
+
+        {/* Metric Grid */}
+        {hasPermission && metrics.length > 0 && (
+          <StaggeredListItem index={2}>
+            <View style={s.grid}>
+              {metrics.map(m => (
+                <View key={m.label} style={s.metricCard}>
+                  <Icon name={m.icon} size={18} color={m.color} weight="fill" />
+                  <Text style={s.metricLabel}>{m.label}</Text>
+                  <Text style={s.metricValue}>{m.value}</Text>
+                  <Text style={s.metricOf}>{m.of}</Text>
+                  <View style={s.progressTrack}>
+                    <View style={[s.progressFill, { width: `${m.pct}%`, backgroundColor: m.color }]} />
+                  </View>
+                </View>
+              ))}
+            </View>
+          </StaggeredListItem>
+        )}
+
+        {/* Blood Pressure */}
+        {hasPermission && data?.bloodPressure && (
+          <StaggeredListItem index={3}>
+            <View style={s.bpCard}>
+              <Icon name="Activity" size={18} color="#8B5CF6" weight="fill" />
+              <View style={{ flex: 1 }}>
+                <Text style={s.bpLabel}>Blood Pressure</Text>
+                <Text style={s.bpValue}>{data.bloodPressure.systolic}/{data.bloodPressure.diastolic} <Text style={s.bpUnit}>mmHg</Text></Text>
+              </View>
+            </View>
+          </StaggeredListItem>
+        )}
+
+        {/* Share with Clary */}
+        {hasPermission && data && (
+          <StaggeredListItem index={4}>
+            <Pressable style={s.shareCard} onPress={shareWithClary}>
+              <View style={s.shareIcon}>
+                <Icon name="ChatCircle" size={20} color={colors.coral} weight="fill" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={s.shareTitle}>Share vitals with Clary</Text>
+                <Text style={s.shareDesc}>Send your health data to AI for personalized insights</Text>
+              </View>
+              <Icon name="ArrowRight" size={18} color={colors.textTertiary} weight="regular" />
+            </Pressable>
+          </StaggeredListItem>
+        )}
+
+        <View style={{ height: 100 }} />
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background },
-  content: { paddingHorizontal: spacing.lg, paddingTop: spacing.xl, paddingBottom: 100 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: spacing['2xl'], backgroundColor: colors.background, gap: spacing.sm },
+  content: { paddingHorizontal: 24, paddingTop: 12 },
 
-  loadingText: { ...typography.caption, color: colors.textTertiary },
-  emptyTitle: { ...typography.cardTitle, color: colors.text, fontWeight: '600', marginTop: spacing.md },
-  emptyDesc: { ...typography.caption, color: colors.textSecondary, textAlign: 'center' },
-  primaryBtn: { backgroundColor: colors.primary, borderRadius: radius.sm, paddingHorizontal: spacing.xl, paddingVertical: spacing.md, marginTop: spacing.lg },
-  primaryBtnText: { ...typography.cardTitle, color: '#FFF' },
-  secondaryBtn: { marginTop: spacing.sm },
-  secondaryBtnText: { ...typography.caption, color: colors.textSecondary },
+  eyebrow: { fontFamily: fonts.generalSans.semiBold, fontSize: 11, letterSpacing: 1.5, color: colors.textTertiary, marginBottom: 4 },
+  h1: { fontFamily: fonts.fraunces.semiBold, fontSize: 28, lineHeight: 34, color: colors.text, marginBottom: 20 },
 
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.xl },
-  title: { ...typography.screenTitle, color: colors.text },
-  syncBadge: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
-  syncDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.success },
-  syncText: { ...typography.meta, color: colors.textSecondary },
+  // Permission card
+  permCard: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: 24, borderWidth: 1, borderColor: colors.border, alignItems: 'center', marginBottom: 16 },
+  permTitle: { fontFamily: fonts.generalSans.semiBold, fontSize: 16, color: colors.text, marginTop: 12 },
+  permDesc: { fontFamily: fonts.generalSans.regular, fontSize: 13, color: colors.textSecondary, textAlign: 'center', marginTop: 6, lineHeight: 18 },
+  permBtn: { marginTop: 16, backgroundColor: colors.coral, borderRadius: radius.md, paddingHorizontal: 24, paddingVertical: 12 },
+  permBtnText: { fontFamily: fonts.generalSans.semiBold, fontSize: 14, color: colors.textInverse },
 
-  hrCard: {
-    backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.xl,
-    marginBottom: spacing.lg, borderWidth: 1, borderColor: colors.border,
-    borderLeftWidth: 3, borderLeftColor: colors.danger,
-  },
-  hrTop: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.sm },
-  hrLabel: { ...typography.caption, color: colors.textSecondary, flex: 1 },
-  hrTime: { ...typography.meta, color: colors.textTertiary },
-  hrValueRow: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.xs },
-  hrValue: { fontSize: 40, fontWeight: '700', color: colors.text },
-  hrUnit: { ...typography.caption, color: colors.textTertiary },
-  hrStatus: { ...typography.meta, fontWeight: '500', marginTop: spacing.xs },
+  // Hero card
+  heroCard: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: colors.border },
+  heroTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  heroLabel: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  heroLabelText: { fontFamily: fonts.generalSans.medium, fontSize: 13, color: colors.textSecondary },
+  restingPill: { backgroundColor: '#D1FAE5', borderRadius: radius.sm, paddingHorizontal: 8, paddingVertical: 3 },
+  restingText: { fontFamily: fonts.generalSans.semiBold, fontSize: 10, color: colors.sage, letterSpacing: 0.5 },
+  heroValueRow: { flexDirection: 'row', alignItems: 'baseline', marginTop: 8, marginBottom: 20 },
+  heroValue: { fontFamily: fonts.fraunces.bold, fontSize: 56, color: colors.text },
+  heroUnit: { fontFamily: fonts.generalSans.regular, fontSize: 14, color: colors.textTertiary, marginLeft: 6 },
+  noData: { fontFamily: fonts.generalSans.regular, fontSize: 14, color: colors.textTertiary, marginTop: 8 },
 
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.xl },
-  vitalCard: {
-    width: '48%', backgroundColor: colors.surface, borderRadius: radius.md,
-    padding: spacing.lg, borderWidth: 1, borderColor: colors.border, gap: spacing.xs,
-  },
-  vLabel: { ...typography.meta, color: colors.textSecondary },
-  vValue: { fontSize: 18, fontWeight: '600', color: colors.text },
-  vMeta: { ...typography.meta, color: colors.textTertiary },
-  vStatus: { ...typography.meta, fontWeight: '500' },
-  bar: { height: 3, backgroundColor: '#F4F4F5', borderRadius: 2, marginTop: spacing.xs },
-  barFill: { height: 3, backgroundColor: colors.primary, borderRadius: 2 },
+  // Bars
+  barsContainer: { flexDirection: 'row', justifyContent: 'space-between', gap: 6 },
+  barCol: { flex: 1, alignItems: 'center' },
+  barTrack: { height: BAR_MAX_H, justifyContent: 'flex-end', width: '100%' },
+  barFill: { width: '100%', borderRadius: radius.sm },
+  barInactive: { backgroundColor: colors.surfaceSunken },
+  dayLabel: { fontFamily: fonts.generalSans.medium, fontSize: 10, color: colors.textTertiary, marginTop: 6 },
+  dayLabelActive: { color: colors.coral },
 
-  sectionTitle: { ...typography.sectionTitle, color: colors.text, marginBottom: spacing.md },
-  chartCard: {
-    backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.lg,
-    marginBottom: spacing.xl, borderWidth: 1, borderColor: colors.border,
-  },
-  chartBars: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', height: 120 },
-  chartCol: { alignItems: 'center', flex: 1 },
-  chartVal: { ...typography.meta, color: colors.textTertiary, marginBottom: spacing.xs },
-  chartBarBg: { width: 20, height: 80, backgroundColor: '#F4F4F5', borderRadius: 4, justifyContent: 'flex-end', overflow: 'hidden' },
-  chartBarFill: { width: '100%', borderRadius: 4 },
-  chartDay: { ...typography.meta, color: colors.textSecondary, marginTop: spacing.sm },
+  // Grid
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 14 },
+  metricCard: { width: METRIC_W, backgroundColor: colors.surface, borderRadius: radius.lg, padding: 16, borderWidth: 1, borderColor: colors.border },
+  metricLabel: { fontFamily: fonts.generalSans.semiBold, fontSize: 10, letterSpacing: 1, color: colors.textTertiary, marginTop: 10 },
+  metricValue: { fontFamily: fonts.fraunces.semiBold, fontSize: 24, color: colors.text, marginTop: 4 },
+  metricOf: { fontFamily: fonts.generalSans.regular, fontSize: 11, color: colors.textTertiary, marginTop: 2 },
+  progressTrack: { height: 4, borderRadius: 2, backgroundColor: colors.surfaceSunken, marginTop: 12, overflow: 'hidden' },
+  progressFill: { height: 4, borderRadius: 2 },
 
-  claryCard: {
-    flexDirection: 'row', alignItems: 'center', gap: spacing.md,
-    backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.lg,
-    borderWidth: 1, borderColor: colors.border,
-  },
-  claryTitle: { ...typography.cardTitle, color: colors.text },
+  // Blood Pressure
+  bpCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.surface, borderRadius: radius.lg, padding: 16, borderWidth: 1, borderColor: colors.border, marginBottom: 14 },
+  bpLabel: { fontFamily: fonts.generalSans.medium, fontSize: 12, color: colors.textTertiary },
+  bpValue: { fontFamily: fonts.fraunces.semiBold, fontSize: 20, color: colors.text, marginTop: 2 },
+  bpUnit: { fontFamily: fonts.generalSans.regular, fontSize: 12, color: colors.textTertiary },
+
+  // Share with Clary
+  shareCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.coralSoft, borderRadius: radius.lg, padding: 16, borderWidth: 1, borderColor: colors.coral + '30', marginTop: 4 },
+  shareIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.surface, justifyContent: 'center', alignItems: 'center' },
+  shareTitle: { fontFamily: fonts.generalSans.semiBold, fontSize: 14, color: colors.text },
+  shareDesc: { fontFamily: fonts.generalSans.regular, fontSize: 12, color: colors.textSecondary, marginTop: 2 },
 });

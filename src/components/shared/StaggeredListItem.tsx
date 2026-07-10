@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
-import { View, ViewStyle } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
+import { ViewStyle } from 'react-native';
+import { MotiView } from './MotiView';
 
 interface StaggeredListItemProps {
   index: number;
@@ -11,18 +11,20 @@ interface StaggeredListItemProps {
 
 export const StaggeredListItem: React.FC<StaggeredListItemProps> = memo(({
   index,
-  delay = 0,
+  delay = 50,
   style,
   children,
 }) => (
-  <Animated.View
-    entering={FadeIn.delay(delay + index * 30).duration(150)}
+  <MotiView
+    from={{ opacity: 0, translateY: 12 }}
+    animate={{ opacity: 1, translateY: 0 }}
+    transition={{ type: 'timing', duration: 350, delay: delay + index * 80 }}
     style={style}
   >
     {children}
-  </Animated.View>
+  </MotiView>
 ));
 
 export const useStaggeredEntrance = (_index: number, _options?: { delay?: number; stagger?: number }) => {
-  return FadeIn.duration(150);
+  return undefined;
 };
