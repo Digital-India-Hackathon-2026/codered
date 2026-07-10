@@ -1,4 +1,4 @@
-import axios from 'axios';
+﻿// LifeLens - CodeRed Hackathon 2026`nimport axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from './client';
 
@@ -162,3 +162,4 @@ export const communityAPI = {
     return axios.get(`${AI_BASE}/sessions?user_id=${userId}`, { headers });
   },
 };
+
