@@ -229,7 +229,9 @@ export const ChatScreen = ({ navigation }: any) => {
   );
 };
 
+import { colors, spacing } from '../../theme';
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FAFBFC' },
-  messageList: { paddingTop: 16, paddingBottom: 12 },
+  container: { flex: 1, backgroundColor: colors.surface },
+  messageList: { paddingTop: spacing.lg, paddingBottom: spacing.sm },
 });

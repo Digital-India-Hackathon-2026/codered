@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { Card, Button } from '../../components/UI';
+import { Icon } from '../../components/shared';
 import { healthProfileAPI, dataAPI } from '../../api/services';
-import { colors, spacing, typography, borderRadius, shadows } from '../../theme';
+import { colors, spacing, typography, radius } from '../../theme';
 
 export const ProfileScreen = ({ navigation }: any) => {
   const { user, logout } = useAuth();
@@ -14,14 +15,12 @@ export const ProfileScreen = ({ navigation }: any) => {
   }, []);
 
   const handleExport = async () => {
-    try {
-      await dataAPI.export();
-      Alert.alert('Export Started', 'Your health data export will be emailed to you.');
-    } catch { Alert.alert('Error', 'Could not export data'); }
+    try { await dataAPI.export(); Alert.alert('Export Started', 'Your data export will be emailed.'); }
+    catch { Alert.alert('Error', 'Could not export data'); }
   };
 
   const handleDeleteAccount = () => {
-    Alert.alert('Delete Account', 'This will permanently delete all your data. Are you sure?', [
+    Alert.alert('Delete Account', 'This will permanently delete all your data.', [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Delete', style: 'destructive', onPress: async () => {
         try { await dataAPI.deleteAll(); await logout(); } catch {}
@@ -30,88 +29,102 @@ export const ProfileScreen = ({ navigation }: any) => {
   };
 
   const menuItems = [
-    { icon: '👤', label: 'Edit Profile', onPress: () => navigation.navigate('EditProfile') },
-    { icon: '🏥', label: 'Health Profile', onPress: () => navigation.navigate('HealthProfile') },
-    { icon: '👨‍👩‍👧', label: 'Family History', onPress: () => navigation.navigate('FamilyHistory') },
-    { icon: '🍎', label: 'Lifestyle', onPress: () => navigation.navigate('Lifestyle') },
-    { icon: '⚠️', label: 'Allergies', onPress: () => navigation.navigate('Allergies') },
-    { icon: '📤', label: 'Share Health Summary', onPress: () => navigation.navigate('ShareSummary') },
-    { icon: '📥', label: 'Export My Data', onPress: handleExport },
-    { icon: '🔔', label: 'Notification Settings', onPress: () => navigation.navigate('NotificationSettings') },
-    { icon: '🔒', label: 'Privacy & Consent', onPress: () => navigation.navigate('Privacy') },
-    { icon: '📋', label: 'Audit Log', onPress: () => navigation.navigate('AuditLog') },
+    { icon: 'user', label: 'Edit Profile' },
+    { icon: 'heart', label: 'Health Profile' },
+    { icon: 'users', label: 'Family History' },
+    { icon: 'sun', label: 'Lifestyle' },
+    { icon: 'alert-circle', label: 'Allergies' },
+    { icon: 'share-2', label: 'Share Health Summary' },
+    { icon: 'download', label: 'Export My Data', onPress: handleExport },
+    { icon: 'bell', label: 'Notifications' },
+    { icon: 'lock', label: 'Privacy & Consent' },
   ];
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView style={s.container} contentContainerStyle={s.content}>
       {/* Profile Header */}
-      <Card style={styles.profileCard}>
-        <View style={styles.avatarLarge}>
-          <Text style={styles.avatarLargeText}>{user?.name?.[0] || 'U'}</Text>
+      <View style={s.profileCard}>
+        <View style={s.avatarLarge}>
+          <Text style={s.avatarText}>{user?.name?.[0] || user?.username?.[0] || 'U'}</Text>
         </View>
-        <Text style={styles.userName}>{user?.name}</Text>
-        <Text style={styles.userEmail}>{user?.email || user?.phone}</Text>
+        <Text style={s.userName}>{user?.name || user?.username}</Text>
+        <Text style={s.userEmail}>{user?.email || user?.phone}</Text>
         {profile && (
-          <View style={styles.profileStats}>
-            <View style={styles.stat}>
-              <Text style={styles.statValue}>{profile.age || '—'}</Text>
-              <Text style={styles.statLabel}>Age</Text>
+          <View style={s.statsRow}>
+            <View style={s.stat}>
+              <Text style={s.statValue}>{profile.age || '—'}</Text>
+              <Text style={s.statLabel}>Age</Text>
             </View>
-            <View style={styles.statDivider} />
-            <View style={styles.stat}>
-              <Text style={styles.statValue}>{profile.blood_group || '—'}</Text>
-              <Text style={styles.statLabel}>Blood</Text>
+            <View style={s.statDivider} />
+            <View style={s.stat}>
+              <Text style={s.statValue}>{profile.blood_group || '—'}</Text>
+              <Text style={s.statLabel}>Blood</Text>
             </View>
-            <View style={styles.statDivider} />
-            <View style={styles.stat}>
-              <Text style={styles.statValue}>{profile.conditions?.length || 0}</Text>
-              <Text style={styles.statLabel}>Conditions</Text>
+            <View style={s.statDivider} />
+            <View style={s.stat}>
+              <Text style={s.statValue}>{profile.conditions?.length || 0}</Text>
+              <Text style={s.statLabel}>Conditions</Text>
             </View>
           </View>
         )}
-      </Card>
+      </View>
 
       {/* Menu */}
-      <Card style={styles.menuCard}>
+      <View style={s.menuCard}>
         {menuItems.map((item, i) => (
-          <TouchableOpacity key={i} style={[styles.menuItem, i < menuItems.length - 1 && styles.menuItemBorder]} onPress={item.onPress}>
-            <Text style={styles.menuIcon}>{item.icon}</Text>
-            <Text style={styles.menuLabel}>{item.label}</Text>
-            <Text style={styles.menuArrow}>›</Text>
-          </TouchableOpacity>
+          <Pressable
+            key={i}
+            style={[s.menuItem, i < menuItems.length - 1 && s.menuItemBorder]}
+            onPress={item.onPress}
+          >
+            <Icon name={item.icon} size={18} color={colors.textSecondary} />
+            <Text style={s.menuLabel}>{item.label}</Text>
+            <Icon name="chevron-right" size={16} color={colors.textTertiary} />
+          </Pressable>
         ))}
-      </Card>
+      </View>
 
-      {/* Danger Zone */}
-      <Card style={styles.dangerCard}>
-        <Button title="Logout" variant="outline" onPress={logout} style={{ marginBottom: spacing.md }} />
-        <Button title="Delete Account & All Data" variant="ghost" onPress={handleDeleteAccount} style={{ borderColor: colors.danger }} />
-      </Card>
+      {/* Actions */}
+      <View style={s.dangerSection}>
+        <Button title="Logout" variant="outline" onPress={logout} style={{ marginBottom: spacing.sm }} />
+        <Pressable style={s.deleteBtn} onPress={handleDeleteAccount}>
+          <Text style={s.deleteText}>Delete account</Text>
+        </Pressable>
+      </View>
     </ScrollView>
   );
 };
 
-const styles = StyleSheet.create({
+const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.lg, paddingBottom: 100 },
-  profileCard: { alignItems: 'center', padding: spacing.xxl },
+  content: { padding: spacing.lg, paddingTop: spacing['2xl'], paddingBottom: 100 },
+
+  profileCard: {
+    backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.xl,
+    alignItems: 'center', borderWidth: 1, borderColor: colors.border, marginBottom: spacing.lg,
+  },
   avatarLarge: {
-    width: 80, height: 80, borderRadius: 40, backgroundColor: colors.primary,
+    width: 64, height: 64, borderRadius: 32, backgroundColor: '#F4F4F5',
     justifyContent: 'center', alignItems: 'center', marginBottom: spacing.md,
   },
-  avatarLargeText: { fontSize: 32, color: '#fff', fontWeight: '700' },
-  userName: { ...typography.h2, color: colors.text },
-  userEmail: { ...typography.body, color: colors.textSecondary, marginTop: 2 },
-  profileStats: { flexDirection: 'row', marginTop: spacing.xl, gap: spacing.xl },
+  avatarText: { fontSize: 24, fontWeight: '600', color: colors.textSecondary },
+  userName: { ...typography.sectionTitle, color: colors.text },
+  userEmail: { ...typography.caption, color: colors.textSecondary, marginTop: 2 },
+  statsRow: { flexDirection: 'row', marginTop: spacing.xl, gap: spacing.xl },
   stat: { alignItems: 'center' },
-  statValue: { ...typography.h3, color: colors.text },
-  statLabel: { ...typography.caption, color: colors.textSecondary },
-  statDivider: { width: 1, height: 30, backgroundColor: colors.border },
-  menuCard: { marginTop: spacing.lg, padding: 0 },
-  menuItem: { flexDirection: 'row', alignItems: 'center', padding: spacing.lg },
-  menuItemBorder: { borderBottomWidth: 1, borderBottomColor: colors.borderLight },
-  menuIcon: { fontSize: 20, marginRight: spacing.md },
+  statValue: { ...typography.cardTitle, color: colors.text, fontWeight: '600' },
+  statLabel: { ...typography.meta, color: colors.textTertiary },
+  statDivider: { width: 1, height: 24, backgroundColor: colors.border },
+
+  menuCard: {
+    backgroundColor: colors.surface, borderRadius: radius.md,
+    borderWidth: 1, borderColor: colors.border, marginBottom: spacing.lg,
+  },
+  menuItem: { flexDirection: 'row', alignItems: 'center', padding: spacing.lg, gap: spacing.md },
+  menuItemBorder: { borderBottomWidth: 1, borderBottomColor: colors.border },
   menuLabel: { ...typography.body, color: colors.text, flex: 1 },
-  menuArrow: { fontSize: 22, color: colors.textTertiary },
-  dangerCard: { marginTop: spacing.lg },
+
+  dangerSection: { marginTop: spacing.sm },
+  deleteBtn: { alignItems: 'center', paddingVertical: spacing.md },
+  deleteText: { ...typography.caption, color: colors.danger },
 });

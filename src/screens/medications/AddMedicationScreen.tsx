@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Alert } from 'react-native';
 import { Button, Input } from '../../components/UI';
+import { Icon } from '../../components/shared';
 import { medicationsAPI } from '../../api/services';
-import { colors, spacing, typography, borderRadius } from '../../theme';
+import { colors, spacing, typography, radius } from '../../theme';
 
 const FREQUENCIES = ['Once daily', 'Twice daily', 'Three times daily', 'As needed', 'Weekly'];
 const TIMINGS = ['Morning', 'Afternoon', 'Evening', 'Night', 'Before meals', 'After meals'];
@@ -27,36 +28,39 @@ export const AddMedicationScreen = ({ navigation }: any) => {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Add Medication</Text>
+    <ScrollView style={s.container} contentContainerStyle={s.content}>
+      <Text style={s.title}>Add Medication</Text>
 
       <Input label="Medication Name" placeholder="e.g. Metformin" value={name} onChangeText={setName} />
       <Input label="Dosage" placeholder="e.g. 500mg" value={dosage} onChangeText={setDosage} />
 
-      <Text style={styles.label}>Frequency</Text>
-      <View style={styles.chipRow}>
+      <Text style={s.label}>Frequency</Text>
+      <View style={s.chipRow}>
         {FREQUENCIES.map(f => (
-          <TouchableOpacity key={f} style={[styles.chip, frequency === f && styles.chipActive]} onPress={() => setFrequency(f)}>
-            <Text style={[styles.chipText, frequency === f && { color: '#fff' }]}>{f}</Text>
-          </TouchableOpacity>
+          <Pressable key={f} style={[s.chip, frequency === f && s.chipActive]} onPress={() => setFrequency(f)}>
+            <Text style={[s.chipText, frequency === f && { color: '#FFF' }]}>{f}</Text>
+          </Pressable>
         ))}
       </View>
 
-      <Text style={styles.label}>Timing</Text>
-      <View style={styles.chipRow}>
+      <Text style={s.label}>Timing</Text>
+      <View style={s.chipRow}>
         {TIMINGS.map(t => (
-          <TouchableOpacity key={t} style={[styles.chip, timing === t && styles.chipActive]} onPress={() => setTiming(t)}>
-            <Text style={[styles.chipText, timing === t && { color: '#fff' }]}>{t}</Text>
-          </TouchableOpacity>
+          <Pressable key={t} style={[s.chip, timing === t && s.chipActive]} onPress={() => setTiming(t)}>
+            <Text style={[s.chipText, timing === t && { color: '#FFF' }]}>{t}</Text>
+          </Pressable>
         ))}
       </View>
 
-      <TouchableOpacity style={styles.toggleRow} onPress={() => setWithFood(!withFood)}>
-        <Text style={styles.toggleLabel}>🍽 Take with food</Text>
-        <View style={[styles.toggle, withFood && styles.toggleActive]}>
-          <View style={[styles.toggleDot, withFood && styles.toggleDotActive]} />
+      <Pressable style={s.toggleRow} onPress={() => setWithFood(!withFood)}>
+        <View style={s.toggleLeft}>
+          <Icon name="coffee" size={16} color={colors.textSecondary} />
+          <Text style={s.toggleLabel}>Take with food</Text>
         </View>
-      </TouchableOpacity>
+        <View style={[s.toggle, withFood && s.toggleActive]}>
+          <View style={[s.toggleDot, withFood && s.toggleDotActive]} />
+        </View>
+      </Pressable>
 
       <Input label="Notes (optional)" placeholder="Any special instructions" value={notes} onChangeText={setNotes} multiline />
 
@@ -65,19 +69,20 @@ export const AddMedicationScreen = ({ navigation }: any) => {
   );
 };
 
-const styles = StyleSheet.create({
+const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  content: { padding: spacing.xxl, paddingBottom: 100 },
-  title: { ...typography.h1, color: colors.text, marginBottom: spacing.xxl },
-  label: { ...typography.caption, color: colors.textSecondary, fontWeight: '600', marginBottom: spacing.sm, marginTop: spacing.md },
+  content: { padding: spacing.xl, paddingBottom: 100 },
+  title: { ...typography.screenTitle, color: colors.text, marginBottom: spacing.xl },
+  label: { ...typography.meta, color: colors.textSecondary, fontWeight: '500', marginBottom: spacing.sm, marginTop: spacing.md },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.md },
-  chip: { paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderRadius: borderRadius.full, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+  chip: { paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderRadius: radius.sm, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
   chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  chipText: { ...typography.caption, color: colors.textSecondary },
-  toggleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: spacing.lg, borderBottomWidth: 1, borderBottomColor: colors.borderLight },
+  chipText: { ...typography.meta, color: colors.textSecondary },
+  toggleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: spacing.lg, borderBottomWidth: 1, borderBottomColor: colors.border },
+  toggleLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   toggleLabel: { ...typography.body, color: colors.text },
-  toggle: { width: 48, height: 28, borderRadius: 14, backgroundColor: colors.border, justifyContent: 'center', padding: 3 },
+  toggle: { width: 44, height: 24, borderRadius: 12, backgroundColor: colors.border, justifyContent: 'center', padding: 2 },
   toggleActive: { backgroundColor: colors.primary },
-  toggleDot: { width: 22, height: 22, borderRadius: 11, backgroundColor: '#fff' },
+  toggleDot: { width: 20, height: 20, borderRadius: 10, backgroundColor: '#FFF' },
   toggleDotActive: { alignSelf: 'flex-end' },
 });

@@ -1,4 +1,4 @@
-﻿// LifeLens - CodeRed Hackathon 2026`nimport axios from 'axios';
+import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const BASE_URL = 'https://askfirst.co/api/main';

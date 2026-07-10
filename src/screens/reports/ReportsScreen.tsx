@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Pressable, Alert, RefreshControl } from 'react-native';
 import { Card, Badge, EmptyState, Button } from '../../components/UI';
+import { Icon } from '../../components/shared';
 import { reportsAPI } from '../../api/services';
-import { colors, spacing, typography, borderRadius, shadows } from '../../theme';
+import { colors, spacing, typography, radius } from '../../theme';
 
 export const ReportsScreen = ({ navigation }: any) => {
   const [reports, setReports] = useState<any[]>([]);
@@ -19,112 +20,87 @@ export const ReportsScreen = ({ navigation }: any) => {
   useEffect(() => { loadReports(); }, []);
   const onRefresh = async () => { setRefreshing(true); await loadReports(); setRefreshing(false); };
 
-  const handleUpload = () => navigation.navigate('UploadReport');
-
   const handleAnalyze = async (id: string) => {
     try {
       await reportsAPI.analyze(id);
-      Alert.alert('Analysis Started', 'AI is analyzing your report. Check back in a moment.');
+      Alert.alert('Analysis Started', 'AI is analyzing your report.');
       loadReports();
-    } catch {
-      Alert.alert('Error', 'Could not start analysis');
-    }
+    } catch { Alert.alert('Error', 'Could not start analysis'); }
+  };
+
+  const getIcon = (type: string) => {
+    const map: Record<string, string> = {
+      blood_test: 'droplet', xray: 'image', mri: 'cpu', ct_scan: 'monitor',
+      prescription: 'file-text', ecg: 'activity', ultrasound: 'radio',
+    };
+    return map[type] || 'file';
   };
 
   const renderReport = ({ item }: { item: any }) => (
-    <Card style={styles.reportCard} onPress={() => navigation.navigate('ReportDetail', { report: item })}>
-      <View style={styles.reportHeader}>
-        <View style={styles.reportIcon}>
-          <Text style={{ fontSize: 24 }}>{getReportIcon(item.type)}</Text>
+    <Card style={s.reportCard}>
+      <View style={s.reportHeader}>
+        <View style={s.reportIcon}>
+          <Icon name={getIcon(item.type)} size={18} color={colors.textSecondary} />
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={styles.reportTitle}>{item.title || item.filename}</Text>
-          <Text style={styles.reportDate}>
+          <Text style={s.reportTitle}>{item.title || item.filename}</Text>
+          <Text style={s.reportDate}>
             {new Date(item.uploaded_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
           </Text>
         </View>
-        <Badge
-          text={item.analyzed ? 'Analyzed' : 'Pending'}
-          color={item.analyzed ? colors.secondary : colors.textTertiary}
-        />
+        <Badge text={item.analyzed ? 'Analyzed' : 'Pending'} color={item.analyzed ? colors.success : colors.textTertiary} />
       </View>
-      {item.summary && (
-        <Text style={styles.reportSummary} numberOfLines={2}>{item.summary}</Text>
-      )}
+      {item.summary && <Text style={s.reportSummary} numberOfLines={2}>{item.summary}</Text>}
       {item.abnormal_count > 0 && (
-        <View style={styles.abnormalBadge}>
-          <Text style={styles.abnormalText}>⚠️ {item.abnormal_count} abnormal value{item.abnormal_count > 1 ? 's' : ''}</Text>
+        <View style={s.abnormalRow}>
+          <Icon name="alert-triangle" size={12} color={colors.danger} />
+          <Text style={s.abnormalText}>{item.abnormal_count} abnormal value{item.abnormal_count > 1 ? 's' : ''}</Text>
         </View>
       )}
       {!item.analyzed && (
-        <TouchableOpacity style={styles.analyzeBtn} onPress={() => handleAnalyze(item.id)}>
-          <Text style={styles.analyzeBtnText}>🤖 Analyze with AI</Text>
-        </TouchableOpacity>
+        <Pressable style={s.analyzeBtn} onPress={() => handleAnalyze(item.id)}>
+          <Text style={s.analyzeBtnText}>Analyze with AI</Text>
+        </Pressable>
       )}
     </Card>
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.screenTitle}>Medical Reports</Text>
-        <Button title="+ Upload" onPress={handleUpload} style={styles.uploadBtn} />
+    <View style={s.container}>
+      <View style={s.header}>
+        <Text style={s.screenTitle}>Reports</Text>
+        <Pressable style={s.uploadBtn} onPress={() => navigation.navigate('UploadReport')}>
+          <Icon name="plus" size={16} color="#FFF" />
+          <Text style={s.uploadBtnText}>Upload</Text>
+        </Pressable>
       </View>
-
       <FlatList
         data={reports}
         renderItem={renderReport}
         keyExtractor={item => item.id}
-        contentContainerStyle={styles.list}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-        ListEmptyComponent={
-          !loading ? (
-            <EmptyState
-              icon="📋"
-              title="No reports yet"
-              subtitle="Upload your blood tests, scans, or prescriptions for AI analysis"
-            />
-          ) : null
-        }
+        contentContainerStyle={s.list}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.textTertiary} />}
+        ListEmptyComponent={!loading ? <EmptyState icon="" title="No reports" subtitle="Upload blood tests, scans, or prescriptions for AI analysis" /> : null}
       />
     </View>
   );
 };
 
-const getReportIcon = (type: string) => {
-  const map: Record<string, string> = {
-    blood_test: '🩸', xray: '🦴', mri: '🧠', ct_scan: '📡',
-    prescription: '💊', ecg: '❤️', ultrasound: '📺',
-  };
-  return map[type] || '📄';
-};
-
-const styles = StyleSheet.create({
+const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  header: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    padding: spacing.lg,
-  },
-  screenTitle: { ...typography.h1, color: colors.text },
-  uploadBtn: { height: 40, paddingHorizontal: spacing.lg },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: spacing.lg, paddingTop: spacing['2xl'] },
+  screenTitle: { ...typography.screenTitle, color: colors.text },
+  uploadBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, backgroundColor: colors.primary, borderRadius: radius.sm, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
+  uploadBtnText: { ...typography.meta, color: '#FFF', fontWeight: '500' },
   list: { padding: spacing.lg, paddingBottom: 100 },
-  reportCard: { marginBottom: spacing.md },
+  reportCard: { marginBottom: spacing.sm },
   reportHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  reportIcon: {
-    width: 44, height: 44, borderRadius: borderRadius.md,
-    backgroundColor: colors.primaryLight, justifyContent: 'center', alignItems: 'center',
-  },
-  reportTitle: { ...typography.bodyBold, color: colors.text },
-  reportDate: { ...typography.caption, color: colors.textSecondary },
+  reportIcon: { width: 36, height: 36, borderRadius: radius.sm, backgroundColor: '#F4F4F5', justifyContent: 'center', alignItems: 'center' },
+  reportTitle: { ...typography.cardTitle, color: colors.text },
+  reportDate: { ...typography.meta, color: colors.textTertiary, marginTop: 1 },
   reportSummary: { ...typography.caption, color: colors.textSecondary, marginTop: spacing.sm },
-  abnormalBadge: {
-    marginTop: spacing.sm, backgroundColor: colors.danger + '10',
-    paddingHorizontal: spacing.sm, paddingVertical: spacing.xs, borderRadius: borderRadius.sm, alignSelf: 'flex-start',
-  },
-  abnormalText: { ...typography.small, color: colors.danger, fontWeight: '600' },
-  analyzeBtn: {
-    marginTop: spacing.sm, paddingVertical: spacing.sm,
-    borderTopWidth: 1, borderTopColor: colors.borderLight,
-  },
-  analyzeBtnText: { ...typography.caption, color: colors.primary, fontWeight: '600', textAlign: 'center' },
+  abnormalRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, marginTop: spacing.sm },
+  abnormalText: { ...typography.meta, color: colors.danger, fontWeight: '500' },
+  analyzeBtn: { marginTop: spacing.sm, paddingTop: spacing.sm, borderTopWidth: 1, borderTopColor: colors.border },
+  analyzeBtnText: { ...typography.caption, color: colors.primary, fontWeight: '500', textAlign: 'center' },
 });

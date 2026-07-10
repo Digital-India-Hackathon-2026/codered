@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { Button, Input } from '../../components/UI';
-import { colors, spacing, typography, borderRadius } from '../../theme';
+import { colors, spacing, typography, radius } from '../../theme';
 
 export const LoginScreen = ({ navigation }: any) => {
   const { login, loginWithOtp } = useAuth();
@@ -27,89 +27,50 @@ export const LoginScreen = ({ navigation }: any) => {
       }
     } catch (e: any) {
       setError(e.response?.data?.message || e.message || 'Login failed');
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-        <View style={styles.header}>
-          <Text style={styles.logo}>🔬</Text>
-          <Text style={styles.title}>LifeLens</Text>
-          <Text style={styles.subtitle}>Your Intelligent Health Timeline</Text>
+    <KeyboardAvoidingView style={s.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
+        <View style={s.header}>
+          <Text style={s.logo}>LifeLens</Text>
+          <Text style={s.subtitle}>Your health companion</Text>
         </View>
 
-        <View style={styles.form}>
-          <View style={styles.modeToggle}>
-            <Button
-              title="📱 Phone"
-              variant={mode === 'phone' ? 'primary' : 'ghost'}
-              onPress={() => setMode('phone')}
-              style={styles.toggleBtn}
-            />
-            <Button
-              title="✉️ Email"
-              variant={mode === 'email' ? 'primary' : 'ghost'}
-              onPress={() => setMode('email')}
-              style={styles.toggleBtn}
-            />
+        <View style={s.form}>
+          <View style={s.modeToggle}>
+            <Button title="Phone" variant={mode === 'phone' ? 'primary' : 'secondary'} onPress={() => setMode('phone')} style={s.toggleBtn} />
+            <Button title="Email" variant={mode === 'email' ? 'primary' : 'secondary'} onPress={() => setMode('email')} style={s.toggleBtn} />
           </View>
 
           {mode === 'phone' ? (
-            <Input
-              label="Phone Number"
-              placeholder="+91 98765 43210"
-              value={phone}
-              onChangeText={setPhone}
-              keyboardType="phone-pad"
-            />
+            <Input label="Phone Number" placeholder="+91 98765 43210" value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
           ) : (
             <>
-              <Input
-                label="Email"
-                placeholder="you@example.com"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-              <Input
-                label="Password"
-                placeholder="••••••••"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-              />
+              <Input label="Email" placeholder="you@example.com" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
+              <Input label="Password" placeholder="••••••••" value={password} onChangeText={setPassword} secureTextEntry />
             </>
           )}
 
-          {error ? <Text style={styles.error}>{error}</Text> : null}
+          {error ? <Text style={s.error}>{error}</Text> : null}
 
           <Button title={mode === 'phone' ? 'Send OTP' : 'Login'} onPress={handleLogin} loading={loading} />
-
-          <Button
-            title="Create Account"
-            variant="outline"
-            onPress={() => navigation.navigate('Register')}
-            style={{ marginTop: spacing.md }}
-          />
+          <Button title="Create Account" variant="ghost" onPress={() => navigation.navigate('Register')} style={{ marginTop: spacing.sm }} />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 };
 
-const styles = StyleSheet.create({
+const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  scroll: { flexGrow: 1, justifyContent: 'center', padding: spacing.xxl },
-  header: { alignItems: 'center', marginBottom: spacing.xxxl },
-  logo: { fontSize: 56, marginBottom: spacing.md },
-  title: { ...typography.h1, color: colors.primary, fontSize: 32 },
-  subtitle: { ...typography.body, color: colors.textSecondary, marginTop: spacing.xs },
-  form: { backgroundColor: colors.surface, borderRadius: borderRadius.xl, padding: spacing.xxl },
+  scroll: { flexGrow: 1, justifyContent: 'center', padding: spacing.xl },
+  header: { alignItems: 'center', marginBottom: spacing['3xl'] },
+  logo: { fontSize: 28, fontWeight: '700', color: colors.text },
+  subtitle: { ...typography.caption, color: colors.textSecondary, marginTop: spacing.xs },
+  form: { backgroundColor: colors.surface, borderRadius: radius.md, padding: spacing.xl, borderWidth: 1, borderColor: colors.border },
   modeToggle: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.xl },
-  toggleBtn: { flex: 1, height: 44 },
-  error: { ...typography.caption, color: colors.danger, marginBottom: spacing.md, textAlign: 'center' },
+  toggleBtn: { flex: 1, height: 40 },
+  error: { ...typography.meta, color: colors.danger, marginBottom: spacing.md, textAlign: 'center' },
 });

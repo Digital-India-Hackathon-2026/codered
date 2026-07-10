@@ -1,4 +1,4 @@
-﻿// LifeLens - CodeRed Hackathon 2026`n{
+{
   "extends": "@react-native/typescript-config",
   "compilerOptions": {
     "types": ["jest"]
@@ -6,4 +6,3 @@
   "include": ["**/*.ts", "**/*.tsx"],
   "exclude": ["**/node_modules", "**/Pods"]
 }
-

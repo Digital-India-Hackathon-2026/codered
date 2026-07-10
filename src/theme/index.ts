@@ -1,83 +1,141 @@
-﻿// LifeLens - CodeRed Hackathon 2026`nexport const colors = {
-  primary: '#0A84FF',
-  primaryDark: '#0066CC',
-  primaryLight: '#E8F4FD',
-  secondary: '#30D158',
-  accent: '#FF9F0A',
-  danger: '#FF453A',
-  warning: '#FFD60A',
-  background: '#F8F9FA',
-  surface: '#FFFFFF',
-  surfaceElevated: '#FFFFFF',
-  text: '#1C1C1E',
-  textSecondary: '#6B7280',
-  textTertiary: '#9CA3AF',
-  border: '#E5E7EB',
-  borderLight: '#F3F4F6',
-  shadow: '#000000',
-  gradient: {
-    primary: ['#0A84FF', '#0066CC'],
-    health: ['#30D158', '#28A745'],
-    warm: ['#FF9F0A', '#FF6B35'],
-    purple: ['#AF52DE', '#8B5CF6'],
-  },
-  severity: {
-    low: '#30D158',
-    moderate: '#FFD60A',
-    high: '#FF9F0A',
-    critical: '#FF453A',
-  },
-};
+// LifeLens Design System — Monochrome base + functional color accents
+// Blue = primary action. Red = danger/high-severity. Yellow = caution. No decoration.
 
+// ─── SPACING (fixed scale, nothing else) ───
 export const spacing = {
   xs: 4,
   sm: 8,
   md: 12,
   lg: 16,
-  xl: 20,
+  xl: 24,
+  '2xl': 32,
+  '3xl': 48,
+  '4xl': 64,
+
+  // Legacy aliases
   xxl: 24,
   xxxl: 32,
 };
 
+// ─── RADIUS (two values only) ───
+export const radius = {
+  sm: 8,   // inputs, chips, small elements
+  md: 12,  // cards, containers
+  // Legacy
+  chip: 8,
+  button: 8,
+  card: 12,
+};
+
+// Legacy alias
 export const borderRadius = {
   sm: 8,
   md: 12,
-  lg: 16,
-  xl: 20,
+  lg: 12,
+  xl: 12,
   full: 999,
 };
 
-export const typography = {
-  h1: { fontSize: 28, fontWeight: '700' as const, lineHeight: 34 },
-  h2: { fontSize: 22, fontWeight: '700' as const, lineHeight: 28 },
-  h3: { fontSize: 18, fontWeight: '600' as const, lineHeight: 24 },
-  body: { fontSize: 16, fontWeight: '400' as const, lineHeight: 22 },
-  bodyBold: { fontSize: 16, fontWeight: '600' as const, lineHeight: 22 },
-  caption: { fontSize: 13, fontWeight: '400' as const, lineHeight: 18 },
-  small: { fontSize: 11, fontWeight: '500' as const, lineHeight: 14 },
-};
-
+// ─── SHADOWS (minimal, near-imperceptible) ───
 export const shadows = {
   sm: {
-    shadowColor: colors.shadow,
+    shadowColor: '#000000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.03,
     shadowRadius: 3,
-    elevation: 2,
+    elevation: 1,
   },
   md: {
-    shadowColor: colors.shadow,
+    shadowColor: '#000000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.05,
     shadowRadius: 8,
-    elevation: 4,
+    elevation: 2,
   },
   lg: {
-    shadowColor: colors.shadow,
+    shadowColor: '#000000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
+    shadowOpacity: 0.08,
     shadowRadius: 16,
-    elevation: 8,
+    elevation: 4,
   },
 };
 
+// ─── COLORS ───
+export const colors = {
+  // Surfaces
+  background: '#FAFAFA',
+  surface: '#FFFFFF',
+  surfaceElevated: '#FFFFFF',
+
+  // Primary — blue, for actions only
+  primary: '#1D4ED8',
+  primaryMuted: '#EFF6FF',
+  primaryLight: '#EFF6FF',
+  primaryDark: '#1E40AF',
+
+  // Semantic — each has ONE job
+  danger: '#DC2626',
+  dangerMuted: '#FEF2F2',
+  warning: '#D97706',
+  warningMuted: '#FFFBEB',
+  success: '#15803D',
+  successMuted: '#F0FDF4',
+
+  // Text
+  text: '#0A0A0B',
+  textSecondary: '#6B6B70',
+  textTertiary: '#A0A0A5',
+
+  // Borders
+  border: '#E4E4E7',
+  borderLight: '#E4E4E7',
+
+  // Legacy aliases (mapped to new system)
+  accent: '#1D4ED8',
+  accentMuted: '#EFF6FF',
+  secondary: '#15803D',
+
+  // Severity
+  severity: {
+    low: '#15803D',
+    moderate: '#D97706',
+    high: '#DC2626',
+    critical: '#DC2626',
+  },
+
+  // Gradients (removed — only keep for backward compat, use sparingly)
+  gradient: {
+    primary: ['#1D4ED8', '#1E40AF'] as [string, string],
+    hero: ['#1D4ED8', '#1E40AF'] as [string, string],
+    soft: ['#FAFAFA', '#F5F5F6'] as [string, string],
+    warm: ['#FAFAFA', '#FAFAFA'] as [string, string],
+    health: ['#15803D', '#15803D'] as [string, string],
+    purple: ['#1D4ED8', '#1D4ED8'] as [string, string],
+  },
+
+  shadow: '#000000',
+};
+
+// ─── TYPOGRAPHY ───
+export const typography = {
+  // Design system scale
+  display: { fontSize: 48, fontWeight: '700' as const, lineHeight: 52 },
+  screenTitle: { fontSize: 24, fontWeight: '600' as const, lineHeight: 30 },
+  sectionTitle: { fontSize: 18, fontWeight: '600' as const, lineHeight: 24 },
+  cardTitle: { fontSize: 15, fontWeight: '500' as const, lineHeight: 20 },
+  body: { fontSize: 14, fontWeight: '400' as const, lineHeight: 20 },
+  bodyMedium: { fontSize: 14, fontWeight: '500' as const, lineHeight: 20 },
+  caption: { fontSize: 13, fontWeight: '400' as const, lineHeight: 18 },
+  meta: { fontSize: 12, fontWeight: '400' as const, lineHeight: 16 },
+
+  // Legacy aliases
+  h1: { fontSize: 24, fontWeight: '600' as const, lineHeight: 30 },
+  h2: { fontSize: 20, fontWeight: '600' as const, lineHeight: 26 },
+  h3: { fontSize: 18, fontWeight: '600' as const, lineHeight: 24 },
+  bodyBold: { fontSize: 15, fontWeight: '500' as const, lineHeight: 20 },
+  small: { fontSize: 12, fontWeight: '400' as const, lineHeight: 16 },
+};
+
+const theme = { spacing, radius, borderRadius, shadows, colors, typography };
+export default theme;
