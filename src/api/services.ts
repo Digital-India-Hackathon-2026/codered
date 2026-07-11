@@ -1,6 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from './client';
+import { env } from '../config/env';
 
 // Auth
 export const authAPI = {
@@ -65,7 +66,7 @@ export const medicationsAPI = {
 };
 
 // Chat (AI Service)
-const AI_BASE = 'https://askfirst.co/api/ai';
+const AI_BASE = env.AI_BASE_URL;
 
 const getAIHeaders = async () => {
   const token = await AsyncStorage.getItem('accessToken');

@@ -1,7 +1,8 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { env } from '../config/env';
 
-const BASE_URL = 'https://askfirst.co/api/main';
+const BASE_URL = env.API_BASE_URL;
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -11,7 +12,10 @@ const api = axios.create({
 
 api.interceptors.request.use(async config => {
   const token = await AsyncStorage.getItem('accessToken');
-  if (token) config.headers.Cookie = `session_token=${token}`;
+  if (token) {
+    config.headers.Cookie = `session_token=${token}`;
+    config.headers.Authorization = `Bearer ${token}`;
+  }
   return config;
 });
 

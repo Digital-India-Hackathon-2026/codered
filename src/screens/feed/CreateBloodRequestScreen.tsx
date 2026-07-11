@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Pressable, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Icon } from '../../components/shared/Icon';
 import { colors, radius, fonts } from '../../theme';
-import api from '../../api/client';
 
 const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 const URGENCY_LEVELS = ['critical', 'urgent', 'normal'];
@@ -24,7 +24,11 @@ export const CreateBloodRequestScreen = ({ navigation }: any) => {
     if (!city.trim()) return Alert.alert('Required', 'Please enter the city.');
     setSubmitting(true);
     try {
-      await api.post('/blood-requests/create', {
+      // Store locally for demo
+      const existing = await AsyncStorage.getItem('blood_requests');
+      const requests = existing ? JSON.parse(existing) : [];
+      requests.unshift({
+        id: Date.now(),
         blood_group: bloodGroup,
         urgency,
         units: parseInt(units) || 1,
@@ -33,7 +37,10 @@ export const CreateBloodRequestScreen = ({ navigation }: any) => {
         contact_number: contactNumber.trim(),
         patient_name: patientName.trim(),
         notes: notes.trim(),
+        created_at: new Date().toISOString(),
       });
+      await AsyncStorage.setItem('blood_requests', JSON.stringify(requests));
+      Alert.alert('Success', 'Blood request posted! Donors in your area will be notified.');
       navigation.goBack();
     } catch {
       Alert.alert('Error', 'Could not create request. Try again.');

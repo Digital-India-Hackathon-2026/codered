@@ -6,6 +6,7 @@ import { Icon } from '../../components/shared/Icon';
 import { StaggeredListItem } from '../../components/shared';
 import { colors, radius, fonts } from '../../theme';
 import api from '../../api/client';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Post {
   id: number;
@@ -73,21 +74,27 @@ export const FeedScreen = () => {
 
   const fetchData = useCallback(async () => {
     try {
-      const [postsRes, amaRes, commRes, bloodRes] = await Promise.allSettled([
+      // Load local posts
+      const localPostsStr = await AsyncStorage.getItem('local_posts');
+      const localPosts: Post[] = localPostsStr ? JSON.parse(localPostsStr) : [];
+
+      // Load local blood requests
+      const localBloodStr = await AsyncStorage.getItem('blood_requests');
+      const localBlood: BloodRequest[] = localBloodStr ? JSON.parse(localBloodStr) : [];
+
+      const [postsRes, amaRes, commRes] = await Promise.allSettled([
         api.get('/public/posts'),
         api.get('/public/ama-feed'),
-        api.post('/community_pages/discover-communities', {}),
-        api.get('/blood-requests'),
+        api.post('/public/discover-communities', {}),
       ]);
-      if (postsRes.status === 'fulfilled') setPosts(postsRes.value.data?.posts || []);
+
+      const apiPosts = postsRes.status === 'fulfilled' ? (postsRes.value.data?.posts || []) : [];
+      setPosts([...localPosts, ...apiPosts]);
+
       if (amaRes.status === 'fulfilled') setAma(amaRes.value.data?.questions || []);
       if (commRes.status === 'fulfilled') setCommunities(commRes.value.data?.communities || []);
-      if (bloodRes.status === 'fulfilled') {
-        const apiRequests = bloodRes.value.data?.requests || [];
-        setBloodRequests(apiRequests.length > 0 ? apiRequests : DUMMY_BLOOD_REQUESTS);
-      } else {
-        setBloodRequests(DUMMY_BLOOD_REQUESTS);
-      }
+
+      setBloodRequests([...localBlood, ...DUMMY_BLOOD_REQUESTS]);
     } catch {} finally { setLoading(false); }
   }, []);
 

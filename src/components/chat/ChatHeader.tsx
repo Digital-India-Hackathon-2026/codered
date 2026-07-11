@@ -22,7 +22,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = memo(({ onBack, onMenu, onN
       <View style={s.center}>
         <ClaryOrb size={28} glow={false} />
         <View>
-          <Text style={s.name}>Clary</Text>
+          <Text style={s.name}>Vita</Text>
           <View style={s.statusRow}>
             <View style={s.statusDot} />
             <Text style={s.status}>Online</Text>

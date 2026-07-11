@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, KeyboardAvoidingView, Platform, Pressable } from 'react-native';
+import { View, Text, StyleSheet, FlatList, KeyboardAvoidingView, Platform, Pressable, Alert, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
+import { deepgramVoice } from '../../services/deepgramVoice';
 import { chatAPI } from '../../api/services';
 import {
   ChatHeader,
@@ -15,6 +17,7 @@ import {
   SummaryCard,
 } from '../../components/chat';
 import { colors, fonts, radius } from '../../theme';
+import { Icon } from '../../components/shared/Icon';
 
 interface Message {
   id: string;
@@ -25,10 +28,13 @@ interface Message {
   metadata?: any;
   answered?: boolean;
   error?: boolean;
-  streaming?: boolean;
+  imageUrl?: string;
 }
 
-const AI_BASE = 'https://askfirst.co/api/ai';
+import { env } from '../../config/env';
+
+const AI_BASE = env.AI_BASE_URL;
+const UPLOAD_BASE = env.UPLOAD_BASE_URL;
 
 export const ChatScreen = ({ navigation, route }: any) => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -36,11 +42,13 @@ export const ChatScreen = ({ navigation, route }: any) => {
   const [loading, setLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [language, setLanguage] = useState<'en' | 'te'>('en');
+  const [pendingImage, setPendingImage] = useState<string | null>(null);
+  const [voiceState, setVoiceState] = useState<'idle' | 'recording' | 'paused' | 'processing'>('idle');
+  const [voiceText, setVoiceText] = useState('');
   const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => { startSession(); }, []);
 
-  // Handle prefill from Vitals screen
   useEffect(() => {
     const prefill = route?.params?.prefill;
     if (prefill && sessionId) {
@@ -54,7 +62,7 @@ export const ChatScreen = ({ navigation, route }: any) => {
       const { data } = await chatAPI.createThread(5918);
       setSessionId(data.id?.toString());
     } catch {
-      setSessionId('default');
+      setSessionId('3740');
     }
   };
 
@@ -65,18 +73,115 @@ export const ChatScreen = ({ navigation, route }: any) => {
     startSession();
   };
 
+  const uploadImage = async (uri: string, fileName: string, mimeType: string): Promise<string | null> => {
+    try {
+      const res = await fetch(`${UPLOAD_BASE}/generate-upload-url`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: fileName, type: mimeType, asset_for: 'chat' }),
+      });
+      const { signed_url, public_url } = await res.json() as { signed_url: string; public_url: string };
+      const fileRes = await fetch(uri);
+      const blob = await fileRes.blob();
+      await fetch(signed_url, {
+        method: 'PUT',
+        headers: { 'Content-Type': mimeType, 'x-ms-blob-type': 'BlockBlob' },
+        body: blob,
+      });
+      return public_url;
+    } catch {
+      return null;
+    }
+  };
+
+  const handleAttach = () => {
+    Alert.alert('Attach', 'Choose an option', [
+      {
+        text: 'Camera',
+        onPress: () => launchCamera({ mediaType: 'photo', quality: 0.8 }, async (res) => {
+          if (res.assets?.[0]) {
+            const asset = res.assets[0];
+            setPendingImage(asset.uri || null);
+            const url = await uploadImage(asset.uri!, asset.fileName || 'photo.jpg', asset.type || 'image/jpeg');
+            if (url) { setPendingImage(url); setInput(prev => prev || 'Analyze this report'); }
+            else { setPendingImage(null); Alert.alert('Upload failed'); }
+          }
+        }),
+      },
+      {
+        text: 'Gallery',
+        onPress: () => launchImageLibrary({ mediaType: 'photo', quality: 0.8 }, async (res) => {
+          if (res.assets?.[0]) {
+            const asset = res.assets[0];
+            setPendingImage(asset.uri || null);
+            const url = await uploadImage(asset.uri!, asset.fileName || 'photo.jpg', asset.type || 'image/jpeg');
+            if (url) { setPendingImage(url); setInput(prev => prev || 'Analyze this report'); }
+            else { setPendingImage(null); Alert.alert('Upload failed'); }
+          }
+        }),
+      },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
+  };
+
+  const handleVoiceStart = async () => {
+    setVoiceText('');
+    const started = await deepgramVoice.start(
+      language,
+      (text, isFinal) => {
+        if (isFinal) {
+          setVoiceText(prev => (prev ? prev + ' ' : '') + text);
+        } else {
+          // Show interim text
+          setVoiceText(prev => {
+            const parts = prev.split(' ');
+            // Replace last word with interim
+            return prev ? prev + ' ' + text : text;
+          });
+        }
+      },
+      (state) => setVoiceState(state),
+      (finalText) => {
+        // Auto-send on silence
+        setVoiceState('idle');
+        setVoiceText('');
+        if (finalText.trim()) {
+          setInput(finalText.trim());
+          // Auto send after small delay
+          setTimeout(() => sendMessage(finalText.trim()), 100);
+        }
+      },
+    );
+    if (!started) setVoiceState('idle');
+  };
+
+  const handleVoiceStop = () => {
+    const text = deepgramVoice.stop();
+    setVoiceState('idle');
+    if (text) {
+      setInput(text);
+      setVoiceText('');
+      // Auto send
+      setTimeout(() => sendMessage(text), 100);
+    } else {
+      setVoiceText('');
+    }
+  };
+
   const sendMessage = async (text?: string) => {
     const msgText = text || input.trim();
-    if (!msgText || loading) return;
+    if ((!msgText && !pendingImage) || loading) return;
 
     setMessages(prev => prev.map(m =>
       (m.type === 'asking_permission' || m.type === 'diagnostic_question') && !m.answered
         ? { ...m, answered: true } : m
     ));
 
-    const userMsg: Message = { id: Date.now().toString(), role: 'user', content: msgText, timestamp: new Date() };
+    const imageToSend = pendingImage?.startsWith('http') ? pendingImage : null;
+    const userMsg: Message = { id: Date.now().toString(), role: 'user', content: msgText || '', timestamp: new Date(), imageUrl: imageToSend || undefined };
     setMessages(prev => [...prev, userMsg]);
     setInput('');
+    setPendingImage(null);
     setLoading(true);
 
     const aiMsgId = (Date.now() + 1).toString();
@@ -94,30 +199,19 @@ export const ChatScreen = ({ navigation, route }: any) => {
           thread_id: parseInt(sessionId || '3740'),
           user_message: language === 'te'
             ? `[RESPOND IN TELUGU LANGUAGE. Keep medical terms in English within parentheses. User message]: ${msgText}`
-            : msgText,
-          images: [],
+            : msgText || 'Analyze this image',
+          images: imageToSend ? [imageToSend] : [],
           documents: [],
           platform: 'mobile',
         }),
       });
 
-      // Create streaming message placeholder
-      setMessages(prev => [...prev, {
-        id: aiMsgId,
-        role: 'assistant',
-        content: '',
-        timestamp: new Date(),
-        streaming: true,
-      }]);
-
       const fullText = await response.text();
       const lines = fullText.split('\n');
-      let accumulated = '';
+      let chunks: string[] = [];
       let responseType = 'chat';
       let metadata: any = null;
 
-      // Simulate streaming by revealing chunks with delays
-      const chunks: string[] = [];
       for (const line of lines) {
         if (line.startsWith('data: ')) {
           try {
@@ -127,11 +221,27 @@ export const ChatScreen = ({ navigation, route }: any) => {
               responseType = parsed.type;
               metadata = parsed.metadata;
             }
+            if (parsed.summary_meta) {
+              metadata = { ...metadata, ...parsed.summary_meta };
+            }
+            if (parsed.summary_section && parsed.key && parsed.data) {
+              if (!metadata) metadata = {};
+              if (!metadata.sections) metadata.sections = {};
+              metadata.sections[parsed.key] = parsed.data;
+            }
           } catch {}
         }
       }
 
-      // Stream tokens visually - fast batched reveal
+      // Streaming animation
+      setMessages(prev => [...prev, {
+        id: aiMsgId,
+        role: 'assistant',
+        content: '',
+        timestamp: new Date(),
+      }]);
+
+      let accumulated = '';
       const batchSize = Math.max(1, Math.ceil(chunks.length / 40));
       for (let i = 0; i < chunks.length; i += batchSize) {
         for (let j = i; j < Math.min(i + batchSize, chunks.length); j++) {
@@ -142,30 +252,26 @@ export const ChatScreen = ({ navigation, route }: any) => {
           m.id === aiMsgId ? { ...m, content: current } : m
         ));
         if (i + batchSize < chunks.length) {
-          await new Promise(r => setTimeout(r, 12));
+          await new Promise(r => setTimeout(r, 15));
         }
       }
 
-      // Finalize message
       setLoading(false);
-
       setMessages(prev => prev.map(m =>
         m.id === aiMsgId
-          ? { ...m, content: accumulated || 'I couldn\'t generate a response.', streaming: false, ...(responseType !== 'chat' ? { type: responseType, metadata } : {}) }
+          ? { ...m, content: accumulated || 'I couldn\'t generate a response.', ...(responseType !== 'chat' ? { type: responseType, metadata } : {}) }
           : m
       ));
-    } catch {
+    } catch (err) {
+      console.log('Chat error:', err);
       setLoading(false);
-      setMessages(prev => {
-        const filtered = prev.filter(m => m.id !== aiMsgId);
-        return [...filtered, {
-          id: aiMsgId,
-          role: 'assistant',
-          content: 'Something went wrong.',
-          timestamp: new Date(),
-          error: true,
-        }];
-      });
+      setMessages(prev => [...prev, {
+        id: aiMsgId,
+        role: 'assistant',
+        content: 'Something went wrong. Please try again.',
+        timestamp: new Date(),
+        error: true,
+      }]);
     }
   };
 
@@ -183,11 +289,11 @@ export const ChatScreen = ({ navigation, route }: any) => {
   };
 
   const scrollToEnd = useCallback(() => {
-    setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 80);
+    setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 50);
   }, []);
 
   const renderMessage = ({ item }: { item: Message }) => {
-    if (item.role === 'user') return <MessageBubble content={item.content} />;
+    if (item.role === 'user') return <MessageBubble content={item.content} imageUrl={item.imageUrl} />;
 
     if (item.error) {
       return (
@@ -252,7 +358,7 @@ export const ChatScreen = ({ navigation, route }: any) => {
       );
     }
 
-    return <AssistantMessage content={item.content} streaming={item.streaming} />;
+    return <AssistantMessage content={item.content} />;
   };
 
   const isEmpty = messages.length === 0;
@@ -282,15 +388,30 @@ export const ChatScreen = ({ navigation, route }: any) => {
           keyExtractor={item => item.id}
           contentContainerStyle={s.messageList}
           onContentSizeChange={scrollToEnd}
+          onLayout={scrollToEnd}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
-          ListFooterComponent={loading && !messages.some(m => m.streaming) ? <TypingIndicator /> : null}
+          keyboardDismissMode="interactive"
+          ListFooterComponent={loading ? <TypingIndicator /> : null}
         />
+      )}
+      {pendingImage && (
+        <View style={s.previewRow}>
+          <Image source={{ uri: pendingImage }} style={s.previewImg} />
+          <Pressable onPress={() => setPendingImage(null)} style={s.previewClose}>
+            <Icon name="X" size={14} color={colors.textInverse} weight="bold" />
+          </Pressable>
+        </View>
       )}
       <ChatInput
         value={input}
         onChangeText={setInput}
         onSend={() => sendMessage()}
+        onAttach={handleAttach}
+        onVoiceStart={handleVoiceStart}
+        onVoiceStop={handleVoiceStop}
+        voiceState={voiceState}
+        voiceText={voiceText}
         disabled={loading}
       />
     </KeyboardAvoidingView>
@@ -299,17 +420,19 @@ export const ChatScreen = ({ navigation, route }: any) => {
 
 const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background },
-  messageList: { paddingTop: 16, paddingBottom: 8 },
+  messageList: { paddingTop: 20, paddingBottom: 12, flexGrow: 1 },
   errorRow: { marginBottom: 8 },
   retryChip: {
     alignSelf: 'flex-start',
-    marginLeft: 52,
-    backgroundColor: colors.surfaceSunken,
-    borderRadius: radius.md,
+    marginLeft: 48,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 16,
     paddingHorizontal: 12,
     paddingVertical: 6,
+    marginTop: 4,
   },
-  retryText: { fontFamily: fonts.generalSans.medium, fontSize: 12, color: colors.coral },
+  retryText: { fontFamily: fonts.generalSans.medium, fontSize: 13, color: colors.coral },
+  previewRow: { flexDirection: 'row', paddingHorizontal: 16, paddingVertical: 8, alignItems: 'center' },
+  previewImg: { width: 56, height: 56, borderRadius: 12, backgroundColor: colors.surfaceSunken },
+  previewClose: { width: 20, height: 20, borderRadius: 10, backgroundColor: '#374151', justifyContent: 'center', alignItems: 'center', marginLeft: -12, marginTop: -44 },
 });
-
-

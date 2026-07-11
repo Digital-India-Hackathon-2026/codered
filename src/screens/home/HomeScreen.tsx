@@ -80,7 +80,7 @@ export const HomeScreen = ({ navigation }: any) => {
           <Text style={s.name}>{firstName}</Text>
         </StaggeredListItem>
 
-        {/* Health Score + Ask Clary Row */}
+        {/* Health Score + Ask Vita Row */}
         <StaggeredListItem index={1}>
           <View style={s.topRow}>
             {/* Health Score Ring */}
@@ -89,12 +89,12 @@ export const HomeScreen = ({ navigation }: any) => {
               <Text style={s.scoreLabel}>Health Score</Text>
             </View>
 
-            {/* Ask Clary */}
+            {/* Ask Vita */}
             <AnimatedPressable onPress={() => navigation.navigate('ChatTab')} style={s.claryCard}>
               <Animated.View style={heroAnim}>
                 <ClaryOrb size={40} />
               </Animated.View>
-              <Text style={s.claryTitle}>Ask Clary</Text>
+              <Text style={s.claryTitle}>Ask Vita</Text>
               <Text style={s.clarySub}>AI health assistant</Text>
               <View style={s.claryArrow}>
                 <Icon name="ArrowRight" size={14} color={colors.coral} weight="bold" />

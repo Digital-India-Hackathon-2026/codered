@@ -21,7 +21,7 @@ export const QuickActions: React.FC<QuickActionsProps> = memo(({ onSelect, langu
   <View style={s.container}>
     <Animated.View entering={FadeIn.duration(300)} style={s.header}>
       <ClaryOrb size={72} glow />
-      <Text style={s.title}>Hi, I'm Clary</Text>
+      <Text style={s.title}>Hi, I'm Vita</Text>
       <Text style={s.subtitle}>
         Ask about a symptom, a medication, or{'\n'}a report — I'll take it from there.
       </Text>

@@ -39,7 +39,7 @@ const Tab = createBottomTabNavigator();
 
 const TAB_CONFIG: Record<string, { icon: string; label: string }> = {
   HomeTab: { icon: 'House', label: 'Home' },
-  ChatTab: { icon: 'ChatCircle', label: 'Clary' },
+  ChatTab: { icon: 'ChatCircle', label: 'Vita' },
   VitalsTab: { icon: 'Heartbeat', label: 'Vitals' },
   TimelineTab: { icon: 'Compass', label: 'Discover' },
   ProfileTab: { icon: 'User', label: 'Profile' },
@@ -65,7 +65,7 @@ const MainTabs = () => (
     })}
   >
     <Tab.Screen name="HomeTab" component={HomeScreen} options={{ tabBarLabel: 'Home' }} />
-    <Tab.Screen name="ChatTab" component={ChatScreen} options={{ tabBarLabel: 'Clary' }} />
+    <Tab.Screen name="ChatTab" component={ChatScreen} options={{ tabBarLabel: 'Vita' }} />
     <Tab.Screen name="VitalsTab" component={VitalsScreen} options={{ tabBarLabel: 'Vitals' }} />
     <Tab.Screen name="TimelineTab" component={FeedScreen} options={{ tabBarLabel: 'Discover' }} />
     <Tab.Screen name="ProfileTab" component={ProfileScreen} options={{ tabBarLabel: 'Profile' }} />

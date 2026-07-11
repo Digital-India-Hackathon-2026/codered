@@ -33,7 +33,7 @@ export const ChatThreadScreen = ({ navigation, route }: any) => {
     try {
       const token = await AsyncStorage.getItem('accessToken');
       const res = await fetch(`${AI_BASE}/chats?thread_id=${id}`, {
-        headers: { 'Content-Type': 'application/json', ...(token ? { Cookie: `session_token=${token}` } : {}) },
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       });
       const data: any = await res.json();
       const msgs: Message[] = (data.messages || [])
@@ -66,7 +66,7 @@ export const ChatThreadScreen = ({ navigation, route }: any) => {
       const token = await AsyncStorage.getItem('accessToken');
       const response = await fetch(`${AI_BASE}/base-chat/chats/stream`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(token ? { Cookie: `session_token=${token}` } : {}) },
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({ user_id: 5918, thread_id: threadId, user_message: msgText, images: [], documents: [], platform: 'mobile' }),
       });
 

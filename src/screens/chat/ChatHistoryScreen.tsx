@@ -78,7 +78,7 @@ export const ChatHistoryScreen = ({ navigation }: any) => {
         <View style={s.empty}>
           <Icon name="ChatCircleDots" size={40} color={colors.textTertiary} weight="regular" />
           <Text style={s.emptyTitle}>No conversations yet</Text>
-          <Text style={s.emptyDesc}>Start chatting with Clary to see your history here</Text>
+          <Text style={s.emptyDesc}>Start chatting with Vita to see your history here</Text>
         </View>
       ) : (
         <FlatList

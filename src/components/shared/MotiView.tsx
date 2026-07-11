@@ -44,52 +44,26 @@ export const MotiView: React.FC<MotiViewProps> = ({
 
     const doAnimate = () => {
       if (animate?.opacity !== undefined) {
-        const toVal = animate.opacity;
-        if (transition?.loop) {
-          opacity.value = withRepeat(
-            withTiming(toVal, config),
-            -1,
-            transition?.repeatReverse ?? true
-          );
-        } else {
-          opacity.value = withTiming(toVal, { ...config, duration: duration + delay });
-        }
+        opacity.value = withTiming(animate.opacity, config);
       }
-
       if (animate?.translateY !== undefined) {
-        const toVal = animate.translateY;
-        if (transition?.loop) {
-          translateY.value = withRepeat(withTiming(toVal, config), -1, transition?.repeatReverse ?? true);
-        } else {
-          translateY.value = withTiming(toVal, { ...config, duration: duration + delay });
-        }
+        translateY.value = withTiming(animate.translateY, config);
       }
-
       if (animate?.translateX !== undefined) {
-        const toVal = animate.translateX;
-        if (transition?.loop) {
-          translateX.value = withRepeat(withTiming(toVal, config), -1, transition?.repeatReverse ?? true);
-        } else {
-          translateX.value = withTiming(toVal, { ...config, duration: duration + delay });
-        }
+        translateX.value = withTiming(animate.translateX, config);
       }
-
       if (animate?.scale !== undefined) {
-        const toVal = animate.scale;
-        if (transition?.loop) {
-          scale.value = withRepeat(withTiming(toVal, config), -1, transition?.repeatReverse ?? true);
-        } else {
-          scale.value = withTiming(toVal, { ...config, duration: duration + delay });
-        }
+        scale.value = withTiming(animate.scale, config);
       }
     };
 
-    if (transition?.delay) {
-      setTimeout(doAnimate, transition.delay);
+    if (delay > 0) {
+      const timer = setTimeout(doAnimate, delay);
+      return () => clearTimeout(timer);
     } else {
       doAnimate();
     }
-  }, []);
+  });
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
