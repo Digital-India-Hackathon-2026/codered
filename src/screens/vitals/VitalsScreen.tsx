@@ -38,6 +38,7 @@ export const VitalsScreen = () => {
   const loadData = useCallback(async () => {
     try {
       const available = await healthConnect.checkAvailability();
+      console.log('HC availability:', available);
       if (available !== 'available') {
         setHasPermission(false);
         setLoading(false);
@@ -45,21 +46,25 @@ export const VitalsScreen = () => {
       }
 
       const inited = await healthConnect.init();
+      console.log('HC init:', inited);
       if (!inited) { setLoading(false); return; }
 
       const hasPerm = await healthConnect.hasPermissions();
+      console.log('HC permissions:', hasPerm);
       setHasPermission(hasPerm);
 
       if (hasPerm) {
         const healthData = await healthConnect.getHealthData();
+        console.log('HC data:', JSON.stringify(healthData));
         setData(healthData);
 
-        // Get 7-day heart rate history
         const stepsHistory = await healthConnect.getStepsHistory(7);
-        // Use steps as bar chart data (more commonly available than HR history)
+        console.log('HC steps history:', stepsHistory);
         setHrHistory(stepsHistory.map(d => d.steps));
       }
-    } catch {} finally { setLoading(false); }
+    } catch (e) {
+      console.log('HC error:', e);
+    } finally { setLoading(false); }
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
@@ -74,7 +79,7 @@ export const VitalsScreen = () => {
     }
   };
 
-  const shareWithClary = () => {
+  const shareWithVita = () => {
     if (!data) return;
     const summary = buildVitalsSummary(data);
     navigation.navigate('ChatTab', { screen: 'ChatTab' });
@@ -226,15 +231,15 @@ export const VitalsScreen = () => {
           </StaggeredListItem>
         )}
 
-        {/* Share with Clary */}
+        {/* Share with Vita */}
         {hasPermission && data && (
           <StaggeredListItem index={4}>
-            <Pressable style={s.shareCard} onPress={shareWithClary}>
+            <Pressable style={s.shareCard} onPress={shareWithVita}>
               <View style={s.shareIcon}>
                 <Icon name="ChatCircle" size={20} color={colors.coral} weight="fill" />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={s.shareTitle}>Share vitals with Clary</Text>
+                <Text style={s.shareTitle}>Share vitals with Vita</Text>
                 <Text style={s.shareDesc}>Send your health data to AI for personalized insights</Text>
               </View>
               <Icon name="ArrowRight" size={18} color={colors.textTertiary} weight="regular" />
@@ -298,7 +303,7 @@ const s = StyleSheet.create({
   bpValue: { fontFamily: fonts.fraunces.semiBold, fontSize: 20, color: colors.text, marginTop: 2 },
   bpUnit: { fontFamily: fonts.generalSans.regular, fontSize: 12, color: colors.textTertiary },
 
-  // Share with Clary
+  // Share with Vita
   shareCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.coralSoft, borderRadius: radius.lg, padding: 16, borderWidth: 1, borderColor: colors.coral + '30', marginTop: 4 },
   shareIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.surface, justifyContent: 'center', alignItems: 'center' },
   shareTitle: { fontFamily: fonts.generalSans.semiBold, fontSize: 14, color: colors.text },

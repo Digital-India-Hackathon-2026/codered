@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Pressable, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Icon } from '../../components/shared/Icon';
 import { colors, radius, fonts } from '../../theme';
-import api from '../../api/client';
 
 const CATEGORIES = ['General', 'Mental Health', 'Nutrition', 'Fitness', 'Chronic Illness', 'Women\'s Health'];
 const INTENTS = ['discussion', 'question', 'experience', 'advice'];
@@ -19,7 +19,21 @@ export const CreatePostScreen = ({ navigation }: any) => {
     if (!title.trim()) return Alert.alert('Required', 'Please add a title.');
     setSubmitting(true);
     try {
-      await api.post('/posts/create', { title: title.trim(), description: description.trim(), category: category || 'General', intent });
+      const existing = await AsyncStorage.getItem('local_posts');
+      const posts = existing ? JSON.parse(existing) : [];
+      posts.unshift({
+        id: Date.now(),
+        author: { id: 5918, username: 'You', image_src: 'https://shoppie.blob.core.windows.net/healthcare/default-avatars/profile_boy3.png', account_type: 'user' },
+        title: title.trim(),
+        description: description.trim(),
+        category: category || 'General',
+        intent,
+        likes_count: 0,
+        comments_count: 0,
+        created_at: new Date().toISOString(),
+      });
+      await AsyncStorage.setItem('local_posts', JSON.stringify(posts));
+      Alert.alert('Success', 'Post created!');
       navigation.goBack();
     } catch {
       Alert.alert('Error', 'Could not create post. Try again.');

@@ -93,7 +93,7 @@ class HealthConnectService {
   async getHealthData(): Promise<HealthData> {
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const yesterday = new Date(startOfDay.getTime() - 24 * 60 * 60 * 1000);
+    const twoDaysAgo = new Date(startOfDay.getTime() - 48 * 60 * 60 * 1000);
 
     const data: HealthData = {
       heartRate: null,
@@ -107,7 +107,7 @@ class HealthConnectService {
 
     try {
       const hr = await readRecords('HeartRate', {
-        timeRangeFilter: { operator: 'between', startTime: yesterday.toISOString(), endTime: now.toISOString() },
+        timeRangeFilter: { operator: 'between', startTime: twoDaysAgo.toISOString(), endTime: now.toISOString() },
       });
       if (hr.records.length > 0) {
         const last = hr.records[hr.records.length - 1];
@@ -125,24 +125,38 @@ class HealthConnectService {
       const steps = await readRecords('Steps', {
         timeRangeFilter: { operator: 'between', startTime: startOfDay.toISOString(), endTime: now.toISOString() },
       });
-      data.steps = steps.records.reduce((sum, r) => sum + ((r as any).count || 0), 0);
+      console.log('Steps raw:', JSON.stringify(steps.records.slice(0, 2)));
+      data.steps = steps.records.reduce((sum, r: any) => sum + (r.count || r.steps || 0), 0);
     } catch (e) { console.log('Steps read error:', e); }
 
     try {
       const sleep = await readRecords('SleepSession', {
-        timeRangeFilter: { operator: 'between', startTime: yesterday.toISOString(), endTime: now.toISOString() },
+        timeRangeFilter: { operator: 'between', startTime: twoDaysAgo.toISOString(), endTime: now.toISOString() },
       });
+      console.log('Sleep raw:', JSON.stringify(sleep.records.slice(0, 2)));
       if (sleep.records.length > 0) {
         const last = sleep.records[sleep.records.length - 1] as any;
-        const durationMs = new Date(last.endTime).getTime() - new Date(last.startTime).getTime();
-        const totalMin = Math.floor(durationMs / 60000);
-        data.sleep = { hours: Math.floor(totalMin / 60), minutes: totalMin % 60 };
+        const startTime = last.endTime || last.endZoneOffset ? last.endTime : last.time;
+        const endTime = last.startTime || last.startZoneOffset ? last.startTime : null;
+        // Try multiple field patterns
+        let durationMs = 0;
+        if (last.endTime && last.startTime) {
+          durationMs = new Date(last.endTime).getTime() - new Date(last.startTime).getTime();
+        } else if (last.duration) {
+          durationMs = last.duration;
+        } else if (last.totalDuration) {
+          durationMs = last.totalDuration;
+        }
+        if (durationMs > 0) {
+          const totalMin = Math.floor(durationMs / 60000);
+          data.sleep = { hours: Math.floor(totalMin / 60), minutes: totalMin % 60 };
+        }
       }
     } catch (e) { console.log('Sleep read error:', e); }
 
     try {
       const spo2 = await readRecords('OxygenSaturation', {
-        timeRangeFilter: { operator: 'between', startTime: yesterday.toISOString(), endTime: now.toISOString() },
+        timeRangeFilter: { operator: 'between', startTime: twoDaysAgo.toISOString(), endTime: now.toISOString() },
       });
       if (spo2.records.length > 0) {
         data.spo2 = (spo2.records[spo2.records.length - 1] as any).percentage;
@@ -165,7 +179,7 @@ class HealthConnectService {
 
     try {
       const bp = await readRecords('BloodPressure', {
-        timeRangeFilter: { operator: 'between', startTime: yesterday.toISOString(), endTime: now.toISOString() },
+        timeRangeFilter: { operator: 'between', startTime: twoDaysAgo.toISOString(), endTime: now.toISOString() },
       });
       if (bp.records.length > 0) {
         const last = bp.records[bp.records.length - 1] as any;

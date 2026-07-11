@@ -1,29 +1,31 @@
 import React, { memo } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import Animated, { FadeInRight } from 'react-native-reanimated';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { colors, radius, fonts } from '../../theme';
 
 interface MessageBubbleProps {
   content: string;
+  imageUrl?: string;
 }
 
-export const MessageBubble: React.FC<MessageBubbleProps> = memo(({ content }) => (
-  <Animated.View entering={FadeInRight.duration(220).damping(18)} style={s.container}>
+export const MessageBubble: React.FC<MessageBubbleProps> = memo(({ content, imageUrl }) => (
+  <View style={s.container}>
     <View style={s.bubble}>
-      <Text style={s.text}>{content}</Text>
+      {imageUrl && <Image source={{ uri: imageUrl }} style={s.image} resizeMode="cover" />}
+      {content ? <Text style={s.text}>{content}</Text> : null}
     </View>
-  </Animated.View>
+  </View>
 ));
 
 const s = StyleSheet.create({
-  container: { alignItems: 'flex-end', paddingHorizontal: 20, marginBottom: 8 },
+  container: { alignItems: 'flex-end', paddingHorizontal: 16, marginBottom: 16 },
   bubble: {
-    maxWidth: '78%',
-    backgroundColor: colors.coral,
-    borderRadius: radius.lg,
-    borderBottomRightRadius: radius.sm,
-    paddingHorizontal: 14,
+    maxWidth: '80%',
+    backgroundColor: '#F3F4F6',
+    borderRadius: 20,
+    borderBottomRightRadius: 6,
+    paddingHorizontal: 16,
     paddingVertical: 10,
   },
-  text: { fontFamily: fonts.generalSans.regular, fontSize: 14, lineHeight: 20, color: colors.textInverse },
+  image: { width: 200, height: 150, borderRadius: 12, marginBottom: 8 },
+  text: { fontFamily: fonts.generalSans.regular, fontSize: 15, lineHeight: 22, color: colors.text },
 });
